@@ -2,23 +2,24 @@ package main
 
 import "math/rand/v2"
 
-func (p *Personnage) BouclierEclair() {
-	p.Defense += 50
+func (p *Personnage)BouclierEclair()  {
+	p.Defense+=50
 }
 
-func (p *Personnage) PendentifVenin() {
-	p.PV += 20
+func (p *Personnage)PendentifVenin(){
+	p.PV+=20
 }
 
-func (p *Personnage) FauxEternite() {
-	p.Attaque += 30
+func (p *Personnage) FauxEternite()  {
+	p.Attaque+=30
 }
 
-func BoitePandore(p *Personnage, m *Personnage) {
-	if rand.N(3) < 2 {
-		p.Attaque *= 2
+func  BoitePandore(p*Personnage,m*Personnage)  {
+	nombre := rand.N(3)
+	if nombre <2{
+		p.Attaque= p.Attaque*2
 	} else {
-		m.Attaque *= 2
+		m.Attaque=m.Attaque*2
 	}
 }
 
