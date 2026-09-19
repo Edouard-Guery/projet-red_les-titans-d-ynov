@@ -2,15 +2,13 @@ package main
 
 import "fmt"
 
-func ChoisirItem()  {
-		var nombre int
+func ChoisirItem() {
+	var nombre int
 	fmt.Print("Entre un chiffre : ")
 	fmt.Scan(&nombre)
 
 	fmt.Printf("Tu as tapé : %d\n", nombre)
 }
-
-
 
 func AfficherItem() {
 	items := BoutiqueMarchand()
