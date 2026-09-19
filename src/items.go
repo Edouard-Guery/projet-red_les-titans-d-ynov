@@ -1,6 +1,5 @@
 package main
 
-// On garde la déclaration du type ICI UNIQUEMENT
 type Equipement struct {
 	Nom         string
 	Source      string
