@@ -95,7 +95,3 @@ func BoutiqueMarchand() []Equipement {
 		},
 	}
 }
-
-func BouclierEclair() {
-
-}

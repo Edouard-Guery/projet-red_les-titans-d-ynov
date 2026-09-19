@@ -14,15 +14,13 @@ func (p *Personnage) FauxEternite()  {
 	p.Attaque+=30
 }
 
-func  BoitePandore(p*Personnage,m*Personnage)  {
-	nombre := rand.N(3)
-	if nombre <2{
-		p.Attaque= p.Attaque*2
-	} else {
-		m.Attaque=m.Attaque*2
-	}
+func (p *Personnage) BoitePandore(m *Personnage) {
+    if rand.N(3) < 2 {
+        p.Attaque *= 2
+    } else {
+        m.Attaque *= 2
+    }
 }
-
 func (p *Personnage) ArmureHephaistos() {
 	p.Defense *= 2
 }
@@ -63,4 +61,9 @@ func (p *Personnage) GourdeRegeneration() {
 
 func (p *Personnage) BouclierBoisRenforce() {
 	p.Defense += 15
+}
+func (p *Personnage) CasqueSagesse() {
+	if rand.N(100) < 20 {
+		p.Defense += 20
+	}
 }
