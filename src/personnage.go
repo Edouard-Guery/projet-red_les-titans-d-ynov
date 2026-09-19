@@ -9,6 +9,8 @@ type Personnage struct {
 	PV                     int
 	ToursBonus             bool
 	EmplacementsEquipement int
+	Argent                 int      // Ajout pour la monnaie
+	Inventaire             []string // Ajout pour la limite de 10 items
 }
 
 func Person() Personnage {
@@ -19,6 +21,8 @@ func Person() Personnage {
 		Defense:                10,
 		ToursBonus:             false,
 		EmplacementsEquipement: 3,
+		Argent:                 100, // Oboles de départ
+		Inventaire:             []string{},
 	}
 
 	Monstre := Personnage{
@@ -30,7 +34,7 @@ func Person() Personnage {
 		EmplacementsEquipement: 0,
 	}
 
-	fmt.Printf("Ton héros s'appelle %s, il a %d PV, %d d'attaque et %d de défense. %s est nul sur Pixel.\n", hero.Nom, hero.PV, hero.Attaque, hero.Defense, Monstre.Nom)
+	fmt.Printf("Ton héros s'appelle %s, il a %d PV, %d d'attaque et %d de défense. %s est nul sur poxel.\n", hero.Nom, hero.PV, hero.Attaque, hero.Defense, Monstre.Nom)
 
 	return hero
 }
