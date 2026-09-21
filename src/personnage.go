@@ -9,8 +9,9 @@ type Personnage struct {
 	PV                     int
 	ToursBonus             bool
 	EmplacementsEquipement int
-	Argent                 int      // Ajout pour la monnaie
-	Inventaire             []string // Ajout pour la limite de 10 items
+	Argent                 int
+	Inventaire             map[string]int // Map pour gérer les quantités
+	CapaciteMax            int
 }
 
 func Person() Personnage {
@@ -21,8 +22,12 @@ func Person() Personnage {
 		Defense:                10,
 		ToursBonus:             false,
 		EmplacementsEquipement: 3,
-		Argent:                 100, // Oboles de départ
-		Inventaire:             []string{},
+		Argent:                 100,
+		CapaciteMax:            10,
+		Inventaire: map[string]int{
+			"Dent d'Orc":   1,
+			"Corne Brisée": 1,
+		},
 	}
 
 	Monstre := Personnage{

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -9,35 +10,38 @@ import (
 func main() {
 	hero := Person()
 	Monstre := Person()
-	var commande string
+
+	// Utilisation du scanner pour tout le jeu (évite les bugs avec fmt.Scan)
+	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
 		fmt.Println("\nCommandes : start, inventaire, shop, forge, potions, casino, info, stop, quit")
 		fmt.Print("> ")
-		fmt.Scan(&commande)
-		commande = strings.ToLower(commande)
+
+		if !scanner.Scan() {
+			break
+		}
+		commande := strings.TrimSpace(strings.ToLower(scanner.Text()))
 
 		switch commande {
 		case "start", "setup":
 			fmt.Println("\n[Combat] - Lancement...")
 		case "inv", "inventaire", "inv-list":
-			fmt.Printf("\nInventaire (%d/10) : %v\n", len(hero.Inventaire), hero.Inventaire)
+			afficherInventaire(&hero) // Fonction du forgeron
 		case "magasin", "shop":
 			AfficherItem()
 			ChoisirItem(&hero, &Monstre)
 		case "forge", "craft":
-			fmt.Println("\n[Forge] - À venir...")
+			menuForgeron(&hero, scanner) // Appel de la forge de Clovis
 		case "potions", "potion":
-			// Appel du nouveau shop -- edouardo
 			hero.ShopPotions()
-		case "stop", "end":
+		case "stop", "end", "info":
 			fmt.Printf("\nStats - PV: %d | Attaque: %d | Défense: %d | Oboles: %d\n", hero.PV, hero.Attaque, hero.Defense, hero.Argent)
 		case "quit", "disconnect":
 			os.Exit(0)
 		case "casino":
-			casino(&hero)
-		case "info":
-			fmt.Printf("\nStats - PV: %d | Attaque: %d | Défense: %d | Oboles: %d\n", hero.PV, hero.Attaque, hero.Defense, hero.Argent)
+			// casino(&hero)
+			fmt.Println("\n[Casino] - À venir...")
 		default:
 			fmt.Println("\nCommande invalide.")
 		}

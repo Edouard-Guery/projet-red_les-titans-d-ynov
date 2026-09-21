@@ -7,7 +7,7 @@ func (p *Personnage) ShopPotions() {
 
 	for {
 		fmt.Println("\n=== MAGASIN DE POTIONS (DIONYSOS) ===")
-		fmt.Printf("Oboles : %d | Inventaire : %d/10\n\n", p.Argent, len(p.Inventaire))
+		fmt.Printf("Oboles : %d | Inventaire : %d/10\n\n", p.Argent, p.nombreObjets())
 
 		fmt.Println("1. Potion de vie (+)           - 5 Oboles")
 		fmt.Println("2. Potion de vie (++)          - 15 Oboles")
@@ -62,13 +62,13 @@ func (p *Personnage) ShopPotions() {
 }
 
 func (p *Personnage) acheterPotion(nom string, prix int) {
-	if len(p.Inventaire) >= 10 {
+	if p.nombreObjets() >= p.CapaciteMax {
 		fmt.Println("Erreur : Votre inventaire est plein (10 objets max).")
 		return
 	}
 	if p.Argent >= prix {
 		p.Argent -= prix
-		p.Inventaire = append(p.Inventaire, nom)
+		p.Inventaire[nom]++ // Ajout compatible avec le système de la forge
 		fmt.Printf("Acheté : %s (-%d Oboles)\n", nom, prix)
 	} else {
 		fmt.Println("Erreur : Vous n'avez pas assez d'Oboles.")
