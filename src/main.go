@@ -32,7 +32,7 @@ func main() {
 		}
 	}
 
-	// Initialisation de l'héros avec ses vrais paramètres
+	// Initialisation du héros
 	hero := Person(nomHero, classeHero)
 	fmt.Printf("\nBienvenue, %s le %s ! Que votre quête commence.\n", hero.Nom, hero.Classe)
 
@@ -73,9 +73,7 @@ func main() {
 
 		case "magasin", "shop":
 			AfficherItem()
-			// On crée une cible neutre temporaire pour éviter tout bug de fonction manquante
 			monstreActuel := Personnage{Nom: "Cible", PV: 100, Attaque: 10, Defense: 10}
-
 			ChoisirItem(&hero, &monstreActuel, scanner)
 
 		case "forge", "craft":
@@ -97,5 +95,13 @@ func main() {
 		default:
 			fmt.Println("\nCommande invalide.")
 		}
+	}
+}
+
+func NouveauCombatMonstre(personnage *Personnage, monstre *Monstre) *Combat {
+	return &Combat{
+		Joueur:  personnage,
+		Monstre: monstre,
+		Tour:    1,
 	}
 }

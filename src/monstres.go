@@ -1,4 +1,4 @@
-package main
+package main    //maincaca
 
 type Monstre struct {
 	Nom         string
