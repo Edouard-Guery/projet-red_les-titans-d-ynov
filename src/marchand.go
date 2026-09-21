@@ -49,7 +49,7 @@ func AfficherItem() {
 	items := BoutiqueMarchand()
 	fmt.Println("=== BOUTIQUE DES ÉQUIPEMENTS MYTHOLOGIQUES ===")
 	for i, eq := range items {
-		fmt.Printf("%d. %s (%s) — %d Or\n   └─ %s\n\n",
+		fmt.Printf("%d. %s (%s) — %d Oboles\n   └─ %s\n\n",
 			i+1, eq.Nom, eq.Source, eq.Prix, eq.Description)
 	}
 	fmt.Println("15. annuler")

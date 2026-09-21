@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Personnage struct {
 	Nom                    string
 	Attaque                int
@@ -24,22 +22,16 @@ func Person() Personnage {
 		EmplacementsEquipement: 3,
 		Argent:                 100,
 		CapaciteMax:            10,
-		Inventaire: map[string]int{
-			"Dent d'Orc":   1,
-			"Corne Brisée": 1,
-		},
+		Inventaire:             map[string]int{},
 	}
 
-	Monstre := Personnage{
-		Nom:                    "matias",
-		PV:                     100,
-		Attaque:                15,
-		Defense:                10,
-		ToursBonus:             false,
-		EmplacementsEquipement: 0,
-	}
-
-	fmt.Printf("Ton héros s'appelle %s, il a %d PV, %d d'attaque et %d de défense. %s est nul sur poxel.\n", hero.Nom, hero.PV, hero.Attaque, hero.Defense, Monstre.Nom)
-
+	// Monstre := Personnage{
+	// 	Nom:                    "matias",
+	// 	PV:                     100,
+	// 	Attaque:                15,
+	// 	Defense:                10,
+	// 	ToursBonus:             false,
+	// 	EmplacementsEquipement: 0,
+	// }
 	return hero
 }
