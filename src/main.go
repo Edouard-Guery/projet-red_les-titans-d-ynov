@@ -9,9 +9,7 @@ import (
 
 func main() {
 	hero := Person()
-	Monstre := Person()
-
-	// Utilisation du scanner pour tout le jeu (évite les bugs avec fmt.Scan)
+	Monstre := Person() // Initialisé pour pouvoir être passé à la boutique
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -27,12 +25,13 @@ func main() {
 		case "start", "setup":
 			fmt.Println("\n[Combat] - Lancement...")
 		case "inv", "inventaire", "inv-list":
-			afficherInventaire(&hero) // Fonction du forgeron
+			hero.MenuInventaire(scanner) // Utilise ton menu interactif au lieu du simple affichage
 		case "magasin", "shop":
 			AfficherItem()
-			ChoisirItem(&hero, &Monstre)
+			// On passe Monstre et le scanner pour corriger le bug
+			ChoisirItem(&hero, &Monstre, scanner)
 		case "forge", "craft":
-			menuForgeron(&hero, scanner) // Appel de la forge de Clovis
+			menuForgeron(&hero, scanner)
 		case "potions", "potion":
 			hero.ShopPotions()
 		case "stop", "end", "info":
@@ -40,8 +39,7 @@ func main() {
 		case "quit", "disconnect":
 			os.Exit(0)
 		case "casino":
-			// casino(&hero)
-			fmt.Println("\n[Casino] - À venir...")
+			casino(&hero)
 		default:
 			fmt.Println("\nCommande invalide.")
 		}

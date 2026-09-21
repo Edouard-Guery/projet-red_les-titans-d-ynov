@@ -91,7 +91,7 @@ func BoutiqueMarchand() []Equipement {
 			Nom:         "Bouclier en Bois Renforcé",
 			Source:      "L'Orc",
 			Description: "Augmente la défense globale.",
-			Prix:        100,
+			Prix:        50,
 		},
 	}
 }

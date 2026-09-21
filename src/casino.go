@@ -8,19 +8,25 @@ import (
 func casino(p *Personnage) {
 	var paris int
 	var couleur string
+	var cleanup string
 
 	fmt.Println("Bienvenue au casino !")
 	fmt.Println("Vous pouvez jouer à la roulette pour tenter de doubler votre argent.")
 	fmt.Println("Entrez le montant que vous souhaitez miser (ou tapez 0 pour quitter) :")
 	fmt.Scan(&paris)
-	fmt.Println("Entrez la couleur sur laquelle vous souhaitez miser (rouge, noir, vert) :")
-	fmt.Scan(&couleur)
 
 	if paris <= 0 {
 		fmt.Println("Vous quittez le casino.")
+		fmt.Scanln(&cleanup) // Vide le buffer
 		return
-	} else if paris > p.Argent {
+	}
+
+	fmt.Println("Entrez la couleur sur laquelle vous souhaitez miser (rouge, noir, vert) :")
+	fmt.Scan(&couleur)
+
+	if paris > p.Argent {
 		fmt.Println("Vous n'avez pas assez d'argent pour miser cette somme.")
+		fmt.Scanln(&cleanup) // Vide le buffer
 		return
 	} else {
 		if couleur == "vert" {
@@ -51,6 +57,8 @@ func casino(p *Personnage) {
 			fmt.Println("Couleur invalide.")
 		}
 	}
+
+	fmt.Scanln(&cleanup) // Vide le buffer à la fin du jeu
 }
 
 func vert() bool {
@@ -73,4 +81,3 @@ func noir() bool {
 	}
 	return false
 }
-

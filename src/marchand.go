@@ -1,14 +1,57 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-func ChoisirItem(hero *Personnage, monstre *Personnage) {
-	var nombre int
-	fmt.Print("Entre un chiffre : ")
-	fmt.Scan(&nombre)
+func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) {
+		fmt.Print("Entre un chiffre : ")
 
-	fmt.Printf("Tu as tapé : %d\n", nombre)
+	// Utilisation du scanner pour éviter le bug du saut de ligne
+	if !scanner.Scan() {
+		return
+	}
+	choixStr := strings.TrimSpace(scanner.Text())
+	nombre, err := strconv.Atoi(choixStr)
 
+	if err != nil {
+		fmt.Println("Choix invalide !")
+		return
+	}
+
+	if nombre == 15 {
+		return
+	}
+
+	items := BoutiqueMarchand()
+	if nombre < 1 || nombre > len(items) {
+		fmt.Println("Choix invalide !")
+		return
+	}
+
+	itemChoisi := items[nombre-1]
+
+	// 1. Vérification de la place dans le sac à dos (Limite de 10)
+	if hero.nombreObjets() >= hero.CapaciteMax {
+		fmt.Println("Erreur : Votre inventaire est plein.")
+		return
+	}
+
+	// 2. Vérification de la monnaie
+	if hero.Argent < itemChoisi.Prix {
+		fmt.Printf("Erreur : Il vous manque %d Oboles.\n", itemChoisi.Prix-hero.Argent)
+		return
+	}
+
+	// 3. Achat : Déduction des Oboles et ajout dans la map de l'inventaire
+	hero.Argent -= itemChoisi.Prix
+	hero.Inventaire[itemChoisi.Nom]++
+	fmt.Printf("Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n", itemChoisi.Nom, itemChoisi.Prix)
+
+	// 4. Code original conservé : application de l'effet magique
 	switch nombre {
 	case 1:
 		hero.BouclierEclair()
@@ -38,10 +81,6 @@ func ChoisirItem(hero *Personnage, monstre *Personnage) {
 		hero.GourdeRegeneration()
 	case 14:
 		hero.BouclierBoisRenforce()
-	case 15:
-		return // On quitte la fonction proprement
-	default:
-		fmt.Println("Choix invalide !")
 	}
 }
 

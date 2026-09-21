@@ -14,6 +14,7 @@ func (p *Personnage) FauxEternite() {
 	p.Attaque += 30
 }
 
+// m utilise la structure Personnage
 func (p *Personnage) BoitePandore(m *Personnage) {
 	if rand.N(3) < 2 {
 		p.Attaque *= 2
@@ -21,6 +22,7 @@ func (p *Personnage) BoitePandore(m *Personnage) {
 		m.Attaque *= 2
 	}
 }
+
 func (p *Personnage) ArmureHephaistos() {
 	p.Defense *= 2
 }
@@ -37,6 +39,7 @@ func (p *Personnage) SacMagique() {
 	p.EmplacementsEquipement += 1
 }
 
+// m utilise la structure Personnage
 func (p *Personnage) RegardGorgone(m *Personnage) bool {
 	if rand.N(100) < 20 {
 		m.PV = 0
@@ -45,11 +48,13 @@ func (p *Personnage) RegardGorgone(m *Personnage) bool {
 	return false
 }
 
+// m utilise la structure Personnage
 func (p *Personnage) GueuleEnflammee(m *Personnage) {
 	degatsBrulure := 15
 	m.PV -= degatsBrulure
 }
 
+// m utilise la structure Personnage
 func (p *Personnage) HacheDoubleTranchant(m *Personnage) {
 	p.Attaque *= 2
 	m.Attaque *= 2
@@ -62,6 +67,7 @@ func (p *Personnage) GourdeRegeneration() {
 func (p *Personnage) BouclierBoisRenforce() {
 	p.Defense += 15
 }
+
 func (p *Personnage) CasqueSagesse() {
 	if rand.N(100) < 20 {
 		p.Defense += 20
@@ -90,11 +96,12 @@ func (p *Personnage) PotionDefensePlus() {
 	p.Defense += 10
 }
 
-// m = monstre
+// m utilise la structure Personnage
 func (p *Personnage) PotionBaisseAttaque(m *Personnage) {
 	m.Attaque -= 10
 }
 
+// m utilise la structure Personnage
 func (p *Personnage) PotionBaisseDefense(m *Personnage) {
 	m.Defense -= 10
 }

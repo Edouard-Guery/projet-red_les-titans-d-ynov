@@ -20,18 +20,10 @@ func Person() Personnage {
 		Defense:                10,
 		ToursBonus:             false,
 		EmplacementsEquipement: 3,
-		Argent:                 100,
+		Argent:                 10000,
 		CapaciteMax:            10,
 		Inventaire:             map[string]int{},
 	}
 
-	// Monstre := Personnage{
-	// 	Nom:                    "matias",
-	// 	PV:                     100,
-	// 	Attaque:                15,
-	// 	Defense:                10,
-	// 	ToursBonus:             false,
-	// 	EmplacementsEquipement: 0,
-	// }
 	return hero
 }
