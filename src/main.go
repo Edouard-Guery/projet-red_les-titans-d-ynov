@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Initialisation du héros
-	hero := Person(nomHero, classeHero)
+	hero := Person(nomHero, classeHero, scanner)
 	fmt.Printf("\nBienvenue, %s le %s ! Que votre quête commence.\n", hero.Nom, hero.Classe)
 
 	index := 0
@@ -52,25 +52,35 @@ func main() {
 			hero.MenuInventaire(scanner)
 
 		case "start", "fight", "tour de l'olympe", "combat":
-			if index >= len(ListeMonstres) {
-				fmt.Println("\nFélicitations ! Vous avez déjà vaincu tous les monstres !")
-				break
-			}
+    if hero.PV <= 0 {
+        fmt.Println("\nVous êtes inconscient ! Soignez-vous avec une potion avant d'entrer en combat.")
+        break
+    }
 
-			monstre := ObtenirMonstre(index)
-			fmt.Printf("\n--- COMBAT %d/%d : Un %s apparaît ! ---\n", index+1, len(ListeMonstres), monstre.Nom)
+    if index >= len(ListeMonstres) {
+        fmt.Println("\nFélicitations ! Vous avez déjà vaincu tous les monstres !")
+        break
+    }
 
-			combat := NouveauCombatMonstre(&hero, &monstre)
-			combat.LancerDéroulement()
+    monstre := ObtenirMonstre(index)
+    fmt.Printf("\n--- COMBAT %d/%d : Un %s apparaît ! ---\n", index+1, len(ListeMonstres), monstre.Nom)
 
-			// Progression si le héros survit
-			if hero.PV > 0 {
-				index++
-				fmt.Printf("\nVictoire ! Prochain monstre débloqué.\n")
-			} else {
-				fmt.Println("\nGame Over... Reposez-vous avant de tenter un nouveau combat.")
-			}
+    combat := NouveauCombatMonstre(&hero, &monstre)
+    combat.LancerDéroulement()
 
+    // Progression si le héros survit
+    if hero.PV > 0 {
+        index++
+        fmt.Printf("\nVictoire ! Prochain monstre débloqué.\n")
+
+        // TOUS LES 2 BOSS MORTS -> MONTÉE DE NIVEAU + CHOIX D'ATTAQUE
+        if index%2 == 0 {
+            hero.GagnerNiveau(scanner)
+        }
+    } else {
+        fmt.Println("\nGame Over... Vous vous réveillez avec 20% de vos PV.")
+        hero.PV = hero.PVMax / 5
+    }
 		case "magasin", "shop":
 			AfficherItem()
 			monstreActuel := Personnage{Nom: "Cible", PV: 100, Attaque: 10, Defense: 10}
@@ -83,10 +93,11 @@ func main() {
 			hero.ShopPotions()
 
 		case "stop", "end", "info":
-			fmt.Printf("\nStats - Nom: %s | Classe: %s | PV: %d | Attaque: %d | Défense: %d | Oboles: %d\n",
-				hero.Nom, hero.Classe, hero.PV, hero.Attaque, hero.Defense, hero.Argent)
+			fmt.Printf("\nStats - Nom: %s | Classe: %s | PV: %d/%d | Attaque: %d | Défense: %d | Oboles: %d\n",
+				hero.Nom, hero.Classe, hero.PV, hero.PVMax, hero.Attaque, hero.Defense, hero.Argent)
 
 		case "quit", "disconnect":
+			fmt.Println("\nMerci d'avoir joué !")
 			os.Exit(0)
 
 		case "casino":
