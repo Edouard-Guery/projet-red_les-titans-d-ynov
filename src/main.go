@@ -45,8 +45,8 @@ func main() {
 	fmt.Print(Cyan + "👤 Entrez le nom de votre héros : " + Reset)
 	if scanner.Scan() {
 		nomSaisi := strings.TrimSpace(scanner.Text())
-		if nomSaisi != "" {
-			nomHero = nomSaisi
+		if len(nomSaisi) > 0 {
+			nomHero = strings.ToUpper(string(nomSaisi[0])) + strings.ToLower(nomSaisi[1:])
 		}
 	}
 

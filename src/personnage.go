@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand/v2" // Mise à jour sur rand/v2 comme le reste du projet
+	"math/rand/v2"
 	"strconv"
 	"strings"
 )
@@ -34,7 +34,7 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 		Nom:                    nomSaisi,
 		ToursBonus:             false,
 		EmplacementsEquipement: 3,
-		Argent:                 20, // Économie fixée : on commence avec un peu de monnaie (20 oboles au lieu de 1000) pour acheter une potion de base.
+		Argent:                 20,
 		CapaciteMax:            10,
 		FaveurDieux:            map[string]int{},
 		Benedictions:           map[string]bool{},
@@ -45,7 +45,6 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 	classe := strings.ToLower(strings.TrimSpace(classeSaisie))
 	for {
 		switch classe {
-		// La Créature : Le personnage équilibré (Standard)
 		case "creature":
 			joueur.Classe = "Créature"
 			joueur.PV = 80
@@ -57,28 +56,25 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 			joueur.AttaquesApprises = []attaque{MorsureVeneuse, CoupDeBouclier}
 			return joueur
 
-		// Le Demi-Dieu : Axé sur l'Attaque et l'Endurance (Glass Cannon)
 		case "demi-dieu":
 			joueur.Classe = "Demi-Dieu"
-			joueur.PV = 70 // Moins de PV de base, mais frappe plus fort
+			joueur.PV = 70
 			joueur.PVMax = 70
 			joueur.Endurance = 70
 			joueur.EnduranceMax = 70
 			joueur.Attaque = 16
 			joueur.Defense = 4
-			joueur.AttaquesApprises = []attaque{FureurHeroique, EgideDeBronze} // Raccord avec le nerf des compétences
+			joueur.AttaquesApprises = []attaque{FureurHeroique, EgideDeBronze}
 			return joueur
 
-		// Le Dieu : Axé sur la Survie et la Défense (Tank)
 		case "dieu":
 			joueur.Classe = "Dieu"
-			joueur.PV = 110 // Très tanky
+			joueur.PV = 110
 			joueur.PVMax = 110
-			joueur.Endurance = 40 // Mais peu d'endurance
+			joueur.Endurance = 40
 			joueur.EnduranceMax = 40
-			joueur.Attaque = 8 // Frappe moins fort de base
+			joueur.Attaque = 8
 			joueur.Defense = 8
-			// Retrait des attaques ultimes (CataclysmeCosmique) en début de jeu.
 			joueur.AttaquesApprises = []attaque{EclairCeleste, RenaissanceDivine}
 			return joueur
 
@@ -92,7 +88,6 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 	}
 }
 
-// Les dégâts de ces compétences ont été lissés pour correspondre au nouveau système
 var PoolAttaquesDispo = []attaque{
 	{Nom: "Frappe Météore", Dommage: 35, regeneration: 0, defense: 5, CoutEndurance: 25},
 	{Nom: "Siphon d'Âme", Dommage: 20, regeneration: 15, defense: 0, CoutEndurance: 20},
@@ -106,7 +101,7 @@ var PoolAttaquesDispo = []attaque{
 
 func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 	p.Niveau++
-	p.PVMax += 15 // +20 c'était beaucoup tous les 2 combats
+	p.PVMax += 15
 	p.PV = p.PVMax
 	p.EnduranceMax += 5
 	p.Endurance = p.EnduranceMax
