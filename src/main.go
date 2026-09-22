@@ -20,7 +20,6 @@ var Cyan = "\033[36m"
 var Gray = "\033[37m"
 var White = "\033[97m"
 
-// Fonction pour nettoyer le terminal selon le système d'exploitation
 func clearScreen() {
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
@@ -65,7 +64,6 @@ func main() {
 	index := 0
 
 	for {
-		// Menu stylisé
 		fmt.Println("\n" + Blue + "-----------------------------------------------------------------------" + Reset)
 		fmt.Println(Yellow + "📜 Que souhaitez-vous faire ?" + Reset)
 		fmt.Println(White + " 🗡️  start      🎒 inv       🛒 shop      🎯 entrainement  🎲 casino" + Reset)
@@ -82,7 +80,6 @@ func main() {
 		commande := strings.TrimSpace(strings.ToLower(scanner.Text()))
 
 		switch commande {
-		// --- COMMANDE CACHÉE ---
 		case "clear":
 			clearScreen()
 			fmt.Println(Green + "✨ Le terminal a été purifié par les Dieux." + Reset)
@@ -122,7 +119,6 @@ func main() {
 				index++
 				fmt.Printf(Cyan + "🔓 Prochain monstre débloqué." + Reset + "\n")
 
-				// Montée de niveau tous les 2 boss
 				if index%2 == 0 {
 					hero.GagnerNiveau(scanner)
 				}
@@ -145,7 +141,6 @@ func main() {
 		case "stop", "end", "info":
 			fmt.Printf("\n"+Cyan+"📊 Stats - Nom: %s | Classe: %s | PV: %d/%d | ⚡ Endu: %d/%d | Attaque: %d | Défense: %d | Oboles: %d"+Reset+"\n",
 				hero.Nom, hero.Classe, hero.PV, hero.PVMax, hero.Endurance, hero.EnduranceMax, hero.Attaque, hero.Defense, hero.Argent)
-			// --- EASTER EGG ---
 			fmt.Println(Magenta + "🎵 Easter Egg : Jeu certifié par ABBA et Steven Spielberg 🎬" + Reset)
 
 		case "quit", "disconnect":
@@ -158,8 +153,8 @@ func main() {
 		case "casino":
 			casino(&hero)
 
-		case "autel":
-			autel(&hero, scanner)
+		case "autel", "faveur", "prier":
+			PrierALAutel(&hero, scanner)
 
 		default:
 			fmt.Println("\n" + Red + "❌ Commande invalide. Les dieux ne comprennent pas votre requête." + Reset)
@@ -167,7 +162,6 @@ func main() {
 	}
 }
 
-// Fonction pour lier la logique de combat depuis le main
 func NouveauCombatMonstre(personnage *Personnage, monstre *Monstre) *Combat {
 	return &Combat{
 		Joueur:  personnage,

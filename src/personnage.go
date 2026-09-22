@@ -3,28 +3,30 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
+	"math/rand/v2" // Mise à jour sur rand/v2 comme le reste du projet
 	"strconv"
 	"strings"
 )
 
 type Personnage struct {
-	Nom                    string
-	Classe                 string
-	Attaque                int
-	Defense                int
-	PV                     int
-	PVMax                  int
-	Endurance              int
-	EnduranceMax           int
-	ToursBonus             bool
-	EmplacementsEquipement int
-	Argent                 int
-	Inventaire             map[string]int
-	CapaciteMax            int
-	Niveau                 int
+	Nom                     string
+	Classe                  string
+	Attaque                 int
+	Defense                 int
+	PV                      int
+	PVMax                   int
+	Endurance               int
+	EnduranceMax            int
+	ToursBonus              bool
+	EmplacementsEquipement  int
+	Argent                  int
+	Inventaire              map[string]int
+	CapaciteMax             int
+	Niveau                  int
 	AmeliorationsInventaire int
-	AttaquesApprises       []attaque
+	FaveurDieux             map[string]int
+	Benedictions            map[string]bool
+	AttaquesApprises        []attaque
 }
 
 func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Personnage {
@@ -32,8 +34,10 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 		Nom:                    nomSaisi,
 		ToursBonus:             false,
 		EmplacementsEquipement: 3,
-		Argent:                 1000,
+		Argent:                 20, // Économie fixée : on commence avec un peu de monnaie (20 oboles au lieu de 1000) pour acheter une potion de base.
 		CapaciteMax:            10,
+		FaveurDieux:            map[string]int{},
+		Benedictions:           map[string]bool{},
 		Inventaire:             map[string]int{},
 		Niveau:                 1,
 	}
@@ -41,44 +45,45 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 	classe := strings.ToLower(strings.TrimSpace(classeSaisie))
 	for {
 		switch classe {
+		// La Créature : Le personnage équilibré (Standard)
 		case "creature":
-			joueur.Classe = "creature"
+			joueur.Classe = "Créature"
 			joueur.PV = 80
 			joueur.PVMax = 80
 			joueur.Endurance = 50
 			joueur.EnduranceMax = 50
 			joueur.Attaque = 12
 			joueur.Defense = 5
-			// Attaques de départ
 			joueur.AttaquesApprises = []attaque{MorsureVeneuse, CoupDeBouclier}
 			return joueur
 
+		// Le Demi-Dieu : Axé sur l'Attaque et l'Endurance (Glass Cannon)
 		case "demi-dieu":
-			joueur.Classe = "demi-dieu"
-			joueur.PV = 120
-			joueur.PVMax = 120
-			joueur.Endurance = 80
-			joueur.EnduranceMax = 80
-			joueur.Attaque = 20
-			joueur.Defense = 12
-			// Attaques de départ
-			joueur.AttaquesApprises = []attaque{FureurHeroique, EgideDeBronze}
+			joueur.Classe = "Demi-Dieu"
+			joueur.PV = 70 // Moins de PV de base, mais frappe plus fort
+			joueur.PVMax = 70
+			joueur.Endurance = 70
+			joueur.EnduranceMax = 70
+			joueur.Attaque = 16
+			joueur.Defense = 4
+			joueur.AttaquesApprises = []attaque{FureurHeroique, EgideDeBronze} // Raccord avec le nerf des compétences
 			return joueur
 
+		// Le Dieu : Axé sur la Survie et la Défense (Tank)
 		case "dieu":
-			joueur.Classe = "dieu"
-			joueur.PV = 200
-			joueur.PVMax = 200
-			joueur.Endurance = 150
-			joueur.EnduranceMax = 150
-			joueur.Attaque = 35
-			joueur.Defense = 20
-			// Attaques de départ
-			joueur.AttaquesApprises = []attaque{CataclysmeCosmique, JugementAbsolu}
+			joueur.Classe = "Dieu"
+			joueur.PV = 110 // Très tanky
+			joueur.PVMax = 110
+			joueur.Endurance = 40 // Mais peu d'endurance
+			joueur.EnduranceMax = 40
+			joueur.Attaque = 8 // Frappe moins fort de base
+			joueur.Defense = 8
+			// Retrait des attaques ultimes (CataclysmeCosmique) en début de jeu.
+			joueur.AttaquesApprises = []attaque{EclairCeleste, RenaissanceDivine}
 			return joueur
 
 		default:
-			fmt.Println(Red + "❌ Classe inconnue. Choisissez une classe valide : creature, demi-dieu, dieu" + Reset)
+			fmt.Println(Red + "❌ Classe inconnue. Choisissez : creature, demi-dieu, dieu" + Reset)
 			fmt.Print(Cyan + "👉 " + Reset)
 			if scanner.Scan() {
 				classe = strings.ToLower(strings.TrimSpace(scanner.Text()))
@@ -87,33 +92,31 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 	}
 }
 
-// Banque de nouvelles attaques qu'on peut débloquer (avec coût en endurance)
+// Les dégâts de ces compétences ont été lissés pour correspondre au nouveau système
 var PoolAttaquesDispo = []attaque{
-	{Nom: "Frappe Météore", Dommage: 55, regeneration: 0, defense: 10, CoutEndurance: 25},
-	{Nom: "Siphon d'Âme", Dommage: 30, regeneration: 25, defense: 0, CoutEndurance: 20},
-	{Nom: "Bouclier Divin", Dommage: 15, regeneration: 10, defense: 40, CoutEndurance: 15},
-	{Nom: "Éclair Foudroyant", Dommage: 70, regeneration: 0, defense: 5, CoutEndurance: 30},
-	{Nom: "Soin Sacré", Dommage: 10, regeneration: 60, defense: 15, CoutEndurance: 35},
-	{Nom: "Lame d'Ombre", Dommage: 45, regeneration: 15, defense: 0, CoutEndurance: 20},
-	{Nom: "Comète Destructrice", Dommage: 110, regeneration: 0, defense: 20, CoutEndurance: 50},
-	{Nom: "Colère Divine", Dommage: 90, regeneration: 30, defense: 30, CoutEndurance: 40},
+	{Nom: "Frappe Météore", Dommage: 35, regeneration: 0, defense: 5, CoutEndurance: 25},
+	{Nom: "Siphon d'Âme", Dommage: 20, regeneration: 15, defense: 0, CoutEndurance: 20},
+	{Nom: "Bouclier Divin", Dommage: 10, regeneration: 10, defense: 25, CoutEndurance: 15},
+	{Nom: "Éclair Foudroyant", Dommage: 50, regeneration: 0, defense: 5, CoutEndurance: 30},
+	{Nom: "Soin Sacré", Dommage: 5, regeneration: 40, defense: 10, CoutEndurance: 35},
+	{Nom: "Lame d'Ombre", Dommage: 25, regeneration: 10, defense: 0, CoutEndurance: 20},
+	{Nom: "Comète Destructrice", Dommage: 75, regeneration: 0, defense: 10, CoutEndurance: 45},
+	{Nom: "Colère Divine", Dommage: 60, regeneration: 20, defense: 20, CoutEndurance: 40},
 }
 
-// Fonction appelée quand le joueur gagne un niveau
 func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 	p.Niveau++
-	p.PVMax += 20
-	p.PV = p.PVMax // Soigne au passage
-	p.EnduranceMax += 10
-	p.Endurance = p.EnduranceMax // Restaure l'endurance
-	p.Attaque += 5
-	p.Defense += 3
+	p.PVMax += 15 // +20 c'était beaucoup tous les 2 combats
+	p.PV = p.PVMax
+	p.EnduranceMax += 5
+	p.Endurance = p.EnduranceMax
+	p.Attaque += 3
+	p.Defense += 2
 
 	fmt.Println("\n" + Magenta + "============================================================" + Reset)
 	fmt.Printf(Bold+Yellow+"🎉 LA GRÂCE DIVINE VOUS FRAPPE ! Vous voilà niveau %d !"+Reset+"\n", p.Niveau)
-	fmt.Printf(Cyan+"📈 Stats : PV Max +20 (%d) | Endu Max +10 (%d) | Attaque +5 (%d) | Défense +3 (%d)"+Reset+"\n", p.PVMax, p.EnduranceMax, p.Attaque, p.Defense)
+	fmt.Printf(Cyan+"📈 Stats : PV Max +15 (%d) | Endu Max +5 (%d) | Attaque +3 (%d) | Défense +2 (%d)"+Reset+"\n", p.PVMax, p.EnduranceMax, p.Attaque, p.Defense)
 
-	// Sélection de 3 attaques inédites dans le pool
 	options := []attaque{}
 	for _, att := range PoolAttaquesDispo {
 		dejaApprise := false
@@ -128,14 +131,13 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 		}
 	}
 
-	// S'il n'y a plus d'attaques à apprendre
 	if len(options) == 0 {
 		fmt.Println(Gray + "📚 Les dieux n'ont plus rien à t'enseigner !" + Reset)
 		fmt.Println(Magenta + "============================================================" + Reset)
 		return
 	}
 
-	// Mélange les options et prends les 3 premières
+	// Utilisation de math/rand/v2
 	rand.Shuffle(len(options), func(i, j int) { options[i], options[j] = options[j], options[i] })
 	if len(options) > 3 {
 		options = options[:3]

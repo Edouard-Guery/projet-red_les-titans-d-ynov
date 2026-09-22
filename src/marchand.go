@@ -9,26 +9,27 @@ import (
 
 func AfficherItem(hero *Personnage) {
 	items := BoutiqueMarchand()
-	
+
 	fmt.Println("\n" + Magenta + "============================================================" + Reset)
 	fmt.Println(Bold + Yellow + "          🏛️  BOUTIQUE DES ÉQUIPEMENTS MYTHOLOGIQUES 🏛️          " + Reset)
 	fmt.Println(Magenta + "============================================================" + Reset)
 	fmt.Printf(Cyan+"💰 Argent : %d Oboles\n"+Reset, hero.Argent)
+
 	for i, eq := range items {
 		fmt.Printf(White+" %2d. "+Green+"%s "+Cyan+"(%s)"+White+" — "+Yellow+"%d Oboles\n"+Reset, i+1, eq.Nom, eq.Source, eq.Prix)
 		fmt.Printf(Gray+"     └─ %s\n"+Reset, eq.Description)
 	}
-	
-	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
-	fmt.Println(Gray + " 16. Quitter la boutique" + Reset)
-	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
-}
 
-func joueurStats() any {
-	panic("unimplemented")
+	exitOption := len(items) + 1
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+	fmt.Printf(Gray+" %d. Quitter la boutique\n"+Reset, exitOption)
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 }
 
 func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) {
+	items := BoutiqueMarchand()
+	exitOption := len(items) + 1
+
 	fmt.Print(Cyan + "👉 Entre le numéro de l'équipement souhaité : " + Reset)
 
 	if !scanner.Scan() {
@@ -45,12 +46,11 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 		return
 	}
 
-	if nombre == 16 {
+	if nombre == exitOption {
 		fmt.Println(Gray + "👋 Vous quittez la boutique des équipements." + Reset)
 		return
 	}
 
-	items := BoutiqueMarchand()
 	if nombre < 1 || nombre > len(items) {
 		fmt.Println(Red + "❌ Choix invalide !" + Reset)
 		return
@@ -58,9 +58,17 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 
 	itemChoisi := items[nombre-1]
 
-	if hero.nombreObjets() >= hero.CapaciteMax {
-		fmt.Printf(Red+"❌ Erreur : Votre inventaire est plein (%d/%d objets max).\n"+Reset, hero.nombreObjets(), hero.CapaciteMax)
-		return
+	// Vérification de l'espace dans l'inventaire (Sauf si on achète une augmentation d'inventaire)
+	if nombre == 15 {
+		if hero.CapaciteMax >= 40 {
+			fmt.Println(Red + "❌ Votre inventaire est déjà à sa taille maximale." + Reset)
+			return
+		}
+	} else {
+		if hero.nombreObjets() >= hero.CapaciteMax {
+			fmt.Printf(Red+"❌ Erreur : Votre inventaire est plein (%d/%d objets max).\n"+Reset, hero.nombreObjets(), hero.CapaciteMax)
+			return
+		}
 	}
 
 	if hero.Argent < itemChoisi.Prix {
@@ -68,12 +76,18 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 		return
 	}
 
+	// Paiement
 	hero.Argent -= itemChoisi.Prix
-	hero.Inventaire[itemChoisi.Nom]++
-	fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
-	fmt.Println("15. Augmentation d'inventaire (+10 places) —  30 oboles")
-	
 
+	// Ajout à l'inventaire (Sauf pour l'augmentation qui est un effet direct)
+	if nombre != 15 {
+		hero.Inventaire[itemChoisi.Nom]++
+		fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
+	} else {
+		fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles).\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
+	}
+
+	// Application des effets immédiats
 	switch nombre {
 	case 1:
 		hero.BouclierEclair()
@@ -104,32 +118,7 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 	case 14:
 		hero.BouclierBoisRenforce()
 	case 15:
-		hero.upgradeInventorySlot()
+		hero.CapaciteMax += 10
+		fmt.Printf(Bold+Green+"🎒 Succès ! Votre inventaire a été agrandi. Capacité actuelle : %d places.\n"+Reset, hero.CapaciteMax)
 	}
-}
-
-func (p *Personnage) upgradeInventorySlot() bool {
-	const prix = 30
-
-	if p.AmeliorationsInventaire >= 3 {
-		fmt.Println("❌ Vous avez déjà acheté les 3 augmentations d'inventaire.")
-		return false
-	}
-
-	if p.Argent < prix {
-		fmt.Println("❌ Il faut 30 pièces d'or.")
-		return false
-	}
-
-	p.Argent -= prix
-	p.CapaciteMax += 10
-	p.AmeliorationsInventaire++
-
-	fmt.Printf(
-		"🎒 Inventaire augmenté : %d places (%d/3 achats).\n",
-		p.CapaciteMax,
-		p.AmeliorationsInventaire,
-	)
-
-	return true
 }

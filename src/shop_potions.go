@@ -1,3 +1,4 @@
+// shop_potions.go
 package main
 
 import (
@@ -9,24 +10,22 @@ import (
 
 func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 	for {
-		// En-tête stylisée
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 		fmt.Println(Bold + Green + "              🍷 MAGASIN DE POTIONS DE DIONYSOS 🍷              " + Reset)
 		fmt.Println(Magenta + "============================================================" + Reset)
 		fmt.Printf(Cyan+"💰 Oboles : %d | 🎒 Inventaire : %d/%d\n"+Reset, p.Argent, p.nombreObjets(), p.CapaciteMax)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
-		// Liste des potions alignée
-		fmt.Println(White + "  1. Potion de vie (+)           - " + Yellow + "5 Oboles" + Reset)
-		fmt.Println(White + "  2. Potion de vie (++)          - " + Yellow + "15 Oboles" + Reset)
-		fmt.Println(White + "  3. Potion d'attaque (+)        - " + Yellow + "20 Oboles" + Reset)
-		fmt.Println(White + "  4. Potion d'attaque (++)       - " + Yellow + "35 Oboles" + Reset)
-		fmt.Println(White + "  5. Potion baisse d'attaque (-) - " + Yellow + "25 Oboles" + Reset)
-		fmt.Println(White + "  6. Potion de défense (+)       - " + Yellow + "20 Oboles" + Reset)
-		fmt.Println(White + "  7. Potion de défense (++)      - " + Yellow + "35 Oboles" + Reset)
-		fmt.Println(White + "  8. Potion baisse défense (-)   - " + Yellow + "25 Oboles" + Reset)
-		fmt.Println(White + "  9. Potion de poison (+)        - " + Yellow + "15 Oboles" + Reset)
-		fmt.Println(White + " 10. Potion de poison (++)       - " + Yellow + "30 Oboles" + Reset)
+		fmt.Println(White + "  1. Potion de vie (+)           - " + Yellow + "10 Oboles" + Reset)
+		fmt.Println(White + "  2. Potion de vie (++)          - " + Yellow + "30 Oboles" + Reset)
+		fmt.Println(White + "  3. Potion d'attaque (+)        - " + Yellow + "40 Oboles" + Reset)
+		fmt.Println(White + "  4. Potion d'attaque (++)       - " + Yellow + "80 Oboles" + Reset)
+		fmt.Println(White + "  5. Potion baisse d'attaque (-) - " + Yellow + "40 Oboles" + Reset)
+		fmt.Println(White + "  6. Potion de défense (+)       - " + Yellow + "40 Oboles" + Reset)
+		fmt.Println(White + "  7. Potion de défense (++)      - " + Yellow + "80 Oboles" + Reset)
+		fmt.Println(White + "  8. Potion baisse défense (-)   - " + Yellow + "40 Oboles" + Reset)
+		fmt.Println(White + "  9. Potion de poison (+)        - " + Yellow + "30 Oboles" + Reset)
+		fmt.Println(White + " 10. Potion de poison (++)       - " + Yellow + "60 Oboles" + Reset)
 		fmt.Println(Gray + " 11. Quitter la boutique" + Reset)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
@@ -54,25 +53,25 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 
 		switch choix {
 		case 1:
-			nomPotion, prix = "Potion de vie (+)", 5
+			nomPotion, prix = "Potion de vie (+)", 10
 		case 2:
-			nomPotion, prix = "Potion de vie (++)", 15
+			nomPotion, prix = "Potion de vie (++)", 30
 		case 3:
-			nomPotion, prix = "Potion d'attaque (+)", 20
+			nomPotion, prix = "Potion d'attaque (+)", 40
 		case 4:
-			nomPotion, prix = "Potion d'attaque (++)", 35
+			nomPotion, prix = "Potion d'attaque (++)", 80
 		case 5:
-			nomPotion, prix = "Potion baisse d'attaque (-)", 25
+			nomPotion, prix = "Potion baisse d'attaque (-)", 40
 		case 6:
-			nomPotion, prix = "Potion de défense (+)", 20
+			nomPotion, prix = "Potion de défense (+)", 40
 		case 7:
-			nomPotion, prix = "Potion de défense (++)", 35
+			nomPotion, prix = "Potion de défense (++)", 80
 		case 8:
-			nomPotion, prix = "Potion baisse défense (-)", 25
+			nomPotion, prix = "Potion baisse défense (-)", 40
 		case 9:
-			nomPotion, prix = "Potion de poison (+)", 15
+			nomPotion, prix = "Potion de poison (+)", 30
 		case 10:
-			nomPotion, prix = "Potion de poison (++)", 30
+			nomPotion, prix = "Potion de poison (++)", 60
 		default:
 			fmt.Println(Red + "❌ Choix invalide." + Reset)
 			continue

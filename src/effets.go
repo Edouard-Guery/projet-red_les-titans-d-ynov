@@ -133,7 +133,7 @@ func (p Personnage) PotionPoisonPlus(m *Monstre) {
 	fmt.Println(Bold + Green + "🧪 [Poison+] L'ennemi est empoisonné (15 PV/tour) !" + Reset)
 }
 
-func (p Personnage) PotionPoisonPlusPlus(m *Monstr {
+func (p Personnage) PotionPoisonPlusPlus(m *Monstre) {
 	m.EstEmpoisonne = true
 	m.DegatsPoison = 35
 	fmt.Println(Bold + Red + "🧪 [Poison++] L'ennemi subit un poison violent (35 PV/tour) !" + Reset)

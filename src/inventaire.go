@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// Menu interactif pour voir et utiliser les objets de l'inventaire
 func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 	for {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
@@ -18,7 +17,7 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
 		if len(p.Inventaire) == 0 {
-			fmt.Println(Gray + " Votre inventaire est vide." + Reset)
+			fmt.Println(Gray + " Votre sac est vide." + Reset)
 			fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 			return
 		}
@@ -44,13 +43,12 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 			return
 		}
 
-		// Séparation visuelle après la saisie
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
 		choix := strings.TrimSpace(scanner.Text())
 
 		if choix == "0" {
-			fmt.Println(Gray + "🎒 Vous fermez votre sac." + Reset)
+			fmt.Println(Gray + "🎒 Vous refermez votre sac." + Reset)
 			return
 		}
 
@@ -65,33 +63,43 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 	}
 }
 
-// Applique l'effet de l'objet et le retire de l'inventaire
 func (p *Personnage) utiliserObjet(nom string) {
-	// Permet d'équiper les armures de la forge ! (Redirige vers equipement.go)
 	if p.UtiliserEquipementForge(nom) {
 		return
 	}
 
 	switch nom {
 	case "Potion de vie (+)":
-		p.PotionViePlus() // Fonction située dans effets.go
-		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (+) et regagné 30 PV !" + Reset)
+		if p.PV == p.PVMax {
+			fmt.Println(Yellow + "⚠️ Vos PV sont déjà au maximum. Inutile de gâcher une potion." + Reset)
+			return
+		}
+		p.PotionViePlus()
+		if p.PV > p.PVMax {
+			p.PV = p.PVMax
+		}
+		fmt.Printf(Green+"🧪 Vous avez bu une Potion de vie (+). PV actuels : %d/%d\n"+Reset, p.PV, p.PVMax)
 	case "Potion de vie (++)":
+		if p.PV == p.PVMax {
+			fmt.Println(Yellow + "⚠️ Vos PV sont déjà au maximum. Inutile de gâcher une potion." + Reset)
+			return
+		}
 		p.PotionViePlusPlus()
-		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) et regagné 100 PV !" + Reset)
+		if p.PV > p.PVMax {
+			p.PV = p.PVMax
+		}
+		fmt.Printf(Green+"🧪 Vous avez bu une Potion de vie (++). PV actuels : %d/%d\n"+Reset, p.PV, p.PVMax)
 	case "Potion d'attaque (+)":
 		p.PotionAttaquePlus()
-		fmt.Println(Yellow + "🧪 Vous avez bu une Potion d'attaque (+). Votre attaque augmente !" + Reset)
+		fmt.Println(Yellow + "🧪 Vous avez bu une Potion d'attaque (+). Votre puissance brute augmente de manière permanente !" + Reset)
 	case "Potion de défense (+)":
 		p.PotionDefensePlus()
-		fmt.Println(Blue + "🧪 Vous avez bu une Potion de défense (+). Votre défense augmente !" + Reset)
+		fmt.Println(Blue + "🧪 Vous avez bu une Potion de défense (+). Votre peau s'endurcit de manière permanente !" + Reset)
 	default:
-		// Si l'objet n'est pas utilisable (comme les matériaux de forge ou un objet passif)
-		fmt.Printf(Red+"❌ Vous ne pouvez pas utiliser '%s' directement ici.\n"+Reset, nom)
+		fmt.Printf(Red+"❌ Cet objet ('%s') ne peut pas être consommé ou équipé depuis ce menu.\n"+Reset, nom)
 		return
 	}
 
-	// Retire 1 objet du sac après utilisation
 	p.Inventaire[nom]--
 	if p.Inventaire[nom] <= 0 {
 		delete(p.Inventaire, nom)
@@ -100,7 +108,7 @@ func (p *Personnage) utiliserObjet(nom string) {
 
 func (p *Personnage) UpgradeInventorySlot() {
 	if p.CapaciteMax >= 40 {
-		fmt.Println(Red + "❌ Votre inventaire est déjà à sa taille maximale." + Reset)
+		fmt.Println(Red + "❌ Votre sac est déjà à sa taille maximale. Les dieux ne peuvent pas l'agrandir davantage." + Reset)
 		return
 	}
 	p.CapaciteMax += 10

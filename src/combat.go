@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand/v2"
+)
 
 type attaque struct {
 	Nom           string
@@ -10,16 +13,17 @@ type attaque struct {
 	CoutEndurance int // Coût en endurance de l'attaque
 }
 
+// ÉQUILIBRAGE DES COMPÉTENCES
 var (
-	MorsureVeneuse     = attaque{"Morsure Vénéneuse", 15, 0, 0, 8}
-	CoupDeBouclier     = attaque{"Coup de Bouclier", 8, 0, 12, 5}
-	VampirismeSauvage  = attaque{"Vampirisme Sauvage", 12, 6, 0, 10}
-	FureurHeroique     = attaque{"Fureur Héroïque", 45, 10, 15, 20}
-	EgideDeBronze      = attaque{"Égide de Bronze", 20, 15, 45, 15}
-	EclairCeleste      = attaque{"Éclair Céleste", 65, 0, 10, 30}
-	CataclysmeCosmique = attaque{"Cataclysme Cosmique", 150, 40, 80, 65}
-	JugementAbsolu     = attaque{"Jugement Absolu", 250, 0, 100, 90}
-	RenaissanceDivine  = attaque{"Renaissance Divine", 50, 150, 150, 100}
+	MorsureVeneuse     = attaque{"Morsure Vénéneuse", 12, 0, 0, 5}
+	CoupDeBouclier     = attaque{"Coup de Bouclier", 5, 0, 15, 8}
+	VampirismeSauvage  = attaque{"Vampirisme Sauvage", 15, 10, 0, 12}
+	FureurHeroique     = attaque{"Fureur Héroïque", 35, 0, -5, 15} // Baisse de def en contrepartie
+	EgideDeBronze      = attaque{"Égide de Bronze", 10, 5, 30, 20}
+	EclairCeleste      = attaque{"Éclair Céleste", 50, 0, 0, 25}
+	CataclysmeCosmique = attaque{"Cataclysme Cosmique", 100, 0, 0, 45}
+	JugementAbsolu     = attaque{"Jugement Absolu", 150, 0, 50, 60}     // Nerf des dégâts bruts (250 c'était trop)
+	RenaissanceDivine  = attaque{"Renaissance Divine", 20, 100, 50, 80} // Nerf du soin abusif
 )
 
 type Combat struct {
@@ -52,7 +56,6 @@ func (c *Combat) LancerDéroulement() {
 			}
 			fmt.Printf(Red+"☠️  %s souffre du poison et subit %d dégâts ! (PV : %d/%d)\n"+Reset, c.Monstre.Nom, c.Monstre.DegatsPoison, c.Monstre.PV, c.Monstre.PVMax)
 
-			// Si le monstre meurt du poison, on coupe le tour
 			if c.Monstre.PV <= 0 {
 				break
 			}
@@ -74,12 +77,18 @@ func (c *Combat) LancerDéroulement() {
 		c.TourJoueur()
 
 		if c.Monstre.PV <= 0 {
-			c.Joueur.Argent += 20
+			// RÉCOMPENSE DYNAMIQUE : Basée sur les PV Max du monstre (ex: un monstre à 100 PV donne 10 à 20 oboles)
+			recompense := (c.Monstre.PVMax / 10) + rand.N(10)
+			if recompense < 5 {
+				recompense = 5
+			} // Minimum garanti
+
+			c.Joueur.Argent += recompense
 
 			fmt.Println("\n" + Magenta + "============================================================" + Reset)
 			fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
-			fmt.Println(Yellow + "💰 Vous gagnez 20 oboles !" + Reset)
-			fmt.Printf(Yellow+"💰 Oboles total : %d pièces.\n"+Reset, c.Joueur.Argent)
+			fmt.Printf(Yellow+"💰 Le butin s'élève à %d oboles !\n"+Reset, recompense)
+			fmt.Printf(Cyan+"💰 Oboles total : %d pièces.\n"+Reset, c.Joueur.Argent)
 			fmt.Println(Magenta + "============================================================" + Reset)
 
 			break
@@ -94,14 +103,12 @@ func (c *Combat) LancerDéroulement() {
 		c.Tour++
 	}
 
-	// --- DÉSACTIVATION AUTOMATIQUE DU POISON EN FIN DE COMBAT ---
 	c.Monstre.EstEmpoisonne = false
 	c.Monstre.DegatsPoison = 0
 
-	// Vérification finale victoire/défaite
 	if c.Monstre.PV <= 0 {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
-		fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
+		fmt.Printf(Bold+Green+"🏆 %s sort victorieux du combat !\n"+Reset, c.Joueur.Nom)
 		fmt.Println(Magenta + "============================================================" + Reset)
 	} else {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
@@ -120,7 +127,7 @@ func (c *Combat) TourJoueur() {
 
 		offset := 2
 		for i, att := range c.Joueur.AttaquesApprises {
-			fmt.Printf(White+" %d. %s (%d dégâts, %d soin, %d ⚡)\n"+Reset, i+offset, att.Nom, att.Dommage, att.regeneration, att.CoutEndurance)
+			fmt.Printf(White+" %d. %s (%d dégâts base, %d soin, %d ⚡)\n"+Reset, i+offset, att.Nom, att.Dommage, att.regeneration, att.CoutEndurance)
 		}
 
 		indexObjet := len(c.Joueur.AttaquesApprises) + offset
@@ -145,7 +152,7 @@ func (c *Combat) TourJoueur() {
 			att := c.Joueur.AttaquesApprises[choix-offset]
 			if c.Joueur.Endurance >= att.CoutEndurance {
 				c.Joueur.Endurance -= att.CoutEndurance
-				c.ExecuterAttaqueJoueur(att.Nom, att.Dommage, att.regeneration, att.defense)
+				c.ExecuterAttaqueJoueur(att.Nom, att.Dommage+c.Joueur.Attaque, att.regeneration, att.defense) // Ajoute l'attaque du joueur aux dégâts de la compétence
 				break
 			} else {
 				fmt.Println(Red + "❌ Pas assez d'endurance pour lancer cette compétence !" + Reset)
@@ -200,17 +207,17 @@ func (p *Personnage) utiliserObjetdurantcombat(m *Monstre) bool {
 		}
 		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (+) (+30 PV) !" + Reset)
 	case "Potion de vie (++)":
-		p.PV += 100
+		p.PV += 80 // Légèrement nerf (100 c'était beaucoup selon les PV max probables)
 		if p.PV > p.PVMax {
 			p.PV = p.PVMax
 		}
-		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) (+100 PV) !" + Reset)
+		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) (+80 PV) !" + Reset)
 	case "Potion d'attaque (+)":
 		p.Attaque += 10
-		fmt.Println(Yellow + "🧪 Attaque augmentée de 10 !" + Reset)
+		fmt.Println(Yellow + "🧪 Attaque augmentée de 10 pour le reste du combat !" + Reset)
 	case "Potion de défense (+)":
 		p.Defense += 10
-		fmt.Println(Blue + "🧪 Défense augmentée de 10 !" + Reset)
+		fmt.Println(Blue + "🧪 Défense augmentée de 10 pour le reste du combat !" + Reset)
 	case "Potion de poison (+)":
 		p.PotionPoisonPlus(m)
 	case "Potion de poison (++)":
@@ -226,18 +233,19 @@ func (p *Personnage) utiliserObjetdurantcombat(m *Monstre) bool {
 }
 
 func (c *Combat) ExecuterAttaqueJoueur(nomAttaque string, degatsBruts, regen, defBonus int) {
-	fmt.Printf(Bold+Cyan+"⚔️  [JOUEUR] %s lance l'attaque [%s] !\n"+Reset, c.Joueur.Nom, nomAttaque)
+	fmt.Printf(Bold+Cyan+"⚔️  [JOUEUR] %s lance [%s] !\n"+Reset, c.Joueur.Nom, nomAttaque)
 
-	degatsNets := degatsBruts
-	if degatsNets < 0 {
-		degatsNets = 0
+	// La défense ne devrait pas bloquer 100% des dégâts pour éviter les combats infinis
+	degatsNets := degatsBruts - (c.Monstre.Defense / 2) // La def absorbe une partie des dégâts
+	if degatsNets < 2 {                                 // Toujours au moins 2 de dégâts si l'attaque passe
+		degatsNets = 2
 	}
 
 	c.Monstre.PV -= degatsNets
 	if c.Monstre.PV < 0 {
 		c.Monstre.PV = 0
 	}
-	fmt.Printf(Red+"   💥 %s subit %d dégâts (PV restants : %d/%d).\n"+Reset, c.Monstre.Nom, degatsNets, c.Monstre.PV, c.Monstre.PVMax)
+	fmt.Printf(Red+"   💥 %s subit %d dégâts (%d absorbés) (PV restants : %d/%d).\n"+Reset, c.Monstre.Nom, degatsNets, (degatsBruts - degatsNets), c.Monstre.PV, c.Monstre.PVMax)
 
 	if regen > 0 {
 		c.Joueur.PV += regen

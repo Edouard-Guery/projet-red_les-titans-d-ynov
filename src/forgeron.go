@@ -17,67 +17,67 @@ type Recette struct {
 
 func recettesForgeron() []Recette {
 	return []Recette{
-		// Tier 1
+		// Tier 1 - Équipements de base (Abordables)
 		{
 			Nom:         "Cuirasse Sauvage",
 			Tier:        "Tier 1",
 			Ingredients: map[string]int{"Dent d'Orc": 1, "Corne Brisée": 1},
-			Cout:        5,
+			Cout:        15, // Augmenté de 5 à 15
 		},
 		{
 			Nom:         "Regard Infernal",
 			Tier:        "Tier 1",
 			Ingredients: map[string]int{"Œil Pétrifiant": 1, "Croc Infernal": 1},
-			Cout:        5,
+			Cout:        15,
 		},
 		{
 			Nom:         "Brassard de l'Enfer Vivant",
 			Tier:        "Tier 1",
 			Ingredients: map[string]int{"Croc Infernal": 1, "Écaille Régénérante": 1},
-			Cout:        5,
+			Cout:        15,
 		},
 
-		// Tier 2
+		// Tier 2 - Équipements intermédiaires (Plus chers)
 		{
 			Nom:         "Lame du Labyrinthe",
 			Tier:        "Tier 2",
 			Ingredients: map[string]int{"Fil d'Ariane": 1, "Fragment de Lame": 1},
-			Cout:        5,
+			Cout:        40, // Augmenté de 5 à 40
 		},
 		{
 			Nom:         "Manteau Empoisonné",
 			Tier:        "Tier 2",
 			Ingredients: map[string]int{"Fiole de Venin": 1, "Peau du Lion": 1},
-			Cout:        5,
+			Cout:        40,
 		},
 		{
 			Nom:         "Regard Mortel",
 			Tier:        "Tier 2",
-			Ingredients: map[string]int{"Regard Infernal": 1, "Fiole de Venin": 1},
-			Cout:        5,
+			Ingredients: map[string]int{"Regard Infernal": 1, "Fiole de Venin": 1}, // Nécessite un objet T1
+			Cout:        40,
 		},
 
-		// Tier 3
+		// Tier 3 - Équipements finaux (Chers, c'est l'objectif de fin de jeu)
 		{
 			Nom:         "Égide des Mers",
 			Tier:        "Tier 3",
 			Ingredients: map[string]int{"Éclat de Bouclier": 1, "Trident Brisé": 1},
-			Cout:        5,
+			Cout:        80, // Augmenté de 5 à 80
 		},
 		{
 			Nom:         "Foudre Infernale",
 			Tier:        "Tier 3",
 			Ingredients: map[string]int{"Cendre des Enfers": 1, "Éclair Figé": 1},
-			Cout:        5,
+			Cout:        100, // Arme surpuissante = très chère
 		},
 		{
 			Nom:  "Armure du Colosse",
 			Tier: "Tier 3",
 			Ingredients: map[string]int{
-				"Brassard de l'Enfer Vivant": 1,
+				"Brassard de l'Enfer Vivant": 1, // Fusion de deux équipements
 				"Manteau Empoisonné":         1,
 			},
-			Cout: 5,
+			Cout: 120, // Fusion ultime
 		},
 	}
 }
@@ -93,7 +93,7 @@ func (p *Personnage) nombreObjets() int {
 func (p *Personnage) peutForger(recette Recette) error {
 	if p.Argent < recette.Cout {
 		return fmt.Errorf(
-			Red+"❌ Vous n'avez pas assez d'Oboles : il faut %d Oboles, mais vous en avez %d."+Reset,
+			Red+"❌ Héphaïstos secoue la tête : il demande %d Oboles, tu n'en as que %d."+Reset,
 			recette.Cout,
 			p.Argent,
 		)
@@ -114,7 +114,7 @@ func (p *Personnage) peutForger(recette Recette) error {
 
 	if len(manquants) > 0 {
 		return fmt.Errorf(
-			Red+"❌ Vous n'avez pas les ressources nécessaires : %s."+Reset,
+			Red+"❌ Il te manque des matériaux : %s."+Reset,
 			strings.Join(manquants, ", "),
 		)
 	}
@@ -128,7 +128,7 @@ func (p *Personnage) peutForger(recette Recette) error {
 
 	if nombreApresFabrication > p.CapaciteMax {
 		return fmt.Errorf(
-			Red+"❌ Votre inventaire est plein (%d/%d objets)."+Reset,
+			Red+"❌ Ton sac est trop lourd (%d/%d objets). Fais de la place d'abord."+Reset,
 			p.nombreObjets(),
 			p.CapaciteMax,
 		)
@@ -228,7 +228,7 @@ func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
 		if !scanner.Scan() {
 			return
 		}
-		
+
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
 		switch strings.TrimSpace(scanner.Text()) {
@@ -268,7 +268,7 @@ func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) {
 		if !scanner.Scan() {
 			return
 		}
-		
+
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
 		choix := strings.TrimSpace(scanner.Text())
@@ -280,7 +280,7 @@ func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) {
 		index, err := strconv.Atoi(choix)
 
 		if err != nil || index < 1 || index > len(recettes) {
-			fmt.Println(Red + "❌ L'Olympe ne reconnaît pas ce geste..." + Reset)
+			fmt.Println(Red + "❌ Héphaïstos ne comprend pas ta demande..." + Reset)
 			continue
 		}
 
@@ -288,14 +288,14 @@ func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) {
 		err = p.forger(recetteChoisie)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err) // Affiche l'erreur formatée (pas assez d'argent, matériaux manquants, etc.)
 		} else {
-			fmt.Printf(Bold+Green+"🔨 INCROYABLE ! Vous avez forgé '%s' !"+Reset+"\n", recetteChoisie.Nom)
-			fmt.Println(Gray + "Vos objets ont été fondus par Héphaïstos et retirés de votre sac." + Reset)
+			fmt.Printf(Bold+Green+"🔨 INCROYABLE ! Le marteau frappe l'enclume et vous obtenez '%s' !"+Reset+"\n", recetteChoisie.Nom)
+			fmt.Println(Gray + "Vos matériaux ont été fondus par Héphaïstos." + Reset)
 			fmt.Printf(Cyan+"Il vous reste %d Oboles.\n"+Reset, p.Argent)
 		}
 
-		fmt.Print(Gray + "\nFranchis le seuil pour poursuivre ton destin... [Entrée]" + Reset)
+		fmt.Print(Gray + "\nAppuyez sur [Entrée] pour continuer..." + Reset)
 		scanner.Scan()
 	}
 }

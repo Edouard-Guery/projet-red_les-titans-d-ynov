@@ -1,3 +1,4 @@
+// trainingfight.go
 package main
 
 import (
@@ -15,7 +16,7 @@ func trainingFight(joueur *Personnage, scanner *bufio.Scanner) {
 	for i, monstre := range ListeMonstres {
 		fmt.Printf(White+" %2d. "+Red+"%s "+Gray+"(%d PV)\n"+Reset, i+1, monstre.Nom, monstre.PVMax)
 	}
-	
+
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
 	for {
