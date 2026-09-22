@@ -48,7 +48,10 @@ func (c *Combat) LancerDéroulement() {
 
 	for c.Joueur.PV > 0 && c.Monstre.PV > 0 {
 		fmt.Printf("\n--- Tour %d ---\n", c.Tour)
-
+		if c.Joueur.Inventaire["GourdeRegeneration"] > 0 {
+    		fmt.Println("Le joueur possède l'objet !")
+		c.Joueur.GourdeRegeneration()
+		}
 		fmt.Printf("%s : %d/%d PV | Attaque : %d | Défense : %d\n", c.Joueur.Nom, c.Joueur.PV, c.Joueur.PVMax, c.Joueur.Attaque, c.Joueur.Defense)
 		fmt.Printf("%s : %d/%d PV | Attaque : %d | Défense : %d\n", c.Monstre.Nom, c.Monstre.PV, c.Monstre.PVMax, c.Monstre.Attaque, c.Monstre.Defense)
 
@@ -166,7 +169,6 @@ func (p *Personnage) utiliserObjetdurantcombat() bool {
 		fmt.Println("🧪 Vous avez bu une Potion de défense (+). Votre défense augmente de 5 !")
 	}
 
-	// Retire 1 exemplaire de l'inventaire
 	p.Inventaire[nomChoisi]--
 	if p.Inventaire[nomChoisi] <= 0 {
 		delete(p.Inventaire, nomChoisi)

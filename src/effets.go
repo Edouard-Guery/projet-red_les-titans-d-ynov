@@ -1,6 +1,9 @@
 package main
 
-import "math/rand/v2"
+import (
+	"fmt"
+	"math/rand/v2"
+)
 
 func (p *Personnage) BouclierEclair() {
 	p.Defense += 50
@@ -61,7 +64,14 @@ func (p *Personnage) HacheDoubleTranchant(m *Personnage) {
 }
 
 func (p *Personnage) GourdeRegeneration() {
-	p.PV += 10
+	// S'exécute seulement si le joueur n'est pas mort et n'a pas déjà sa vie au max
+	if p.PV > 0 && p.PV < p.PVMax {
+		p.PV += 10
+		if p.PV > p.PVMax {
+			p.PV = p.PVMax
+		}
+		fmt.Printf("💧 [Gourde] %s se régénère de 10 PV ! (%d/%d PV)\n", p.Nom, p.PV, p.PVMax)
+	}
 }
 
 func (p *Personnage) BouclierBoisRenforce() {
