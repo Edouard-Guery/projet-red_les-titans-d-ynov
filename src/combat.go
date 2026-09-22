@@ -44,7 +44,20 @@ func (c *Combat) LancerDéroulement() {
 	for c.Joueur.PV > 0 && c.Monstre.PV > 0 {
 		fmt.Printf("\n"+Yellow+"--- ⏳ Tour %d ---"+Reset+"\n", c.Tour)
 
-		// On régénère 15 d'endurance par tour
+		// --- EFFET DE POISON AU DÉBUT DU TOUR ---
+		if c.Monstre.EstEmpoisonne && c.Monstre.PV > 0 {
+			c.Monstre.PV -= c.Monstre.DegatsPoison
+			if c.Monstre.PV < 0 {
+				c.Monstre.PV = 0
+			}
+			fmt.Printf(Red+"☠️  %s souffre du poison et subit %d dégâts ! (PV : %d/%d)\n"+Reset, c.Monstre.Nom, c.Monstre.DegatsPoison, c.Monstre.PV, c.Monstre.PVMax)
+
+			// Si le monstre meurt du poison, on coupe le tour
+			if c.Monstre.PV <= 0 {
+				break
+			}
+		}
+
 		c.Joueur.Endurance += 15
 		if c.Joueur.Endurance > c.Joueur.EnduranceMax {
 			c.Joueur.Endurance = c.Joueur.EnduranceMax
@@ -58,27 +71,42 @@ func (c *Combat) LancerDéroulement() {
 		fmt.Printf(Cyan+"👤 %s "+Reset+"| ❤️  PV : %d/%d | ⚡ Endu : %d/%d | 🗡️  Attaque : %d | 🛡️  Défense : %d\n", c.Joueur.Nom, c.Joueur.PV, c.Joueur.PVMax, c.Joueur.Endurance, c.Joueur.EnduranceMax, c.Joueur.Attaque, c.Joueur.Defense)
 		fmt.Printf(Red+"👹 %s "+Reset+"| ❤️  PV : %d/%d\n", c.Monstre.Nom, c.Monstre.PV, c.Monstre.PVMax)
 
-		// Tour du joueur
 		c.TourJoueur()
 
 		if c.Monstre.PV <= 0 {
+			c.Joueur.Argent += 20
+
 			fmt.Println("\n" + Magenta + "============================================================" + Reset)
 			fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
+			fmt.Println(Yellow + "💰 Vous gagnez 20 oboles !" + Reset)
+			fmt.Printf(Yellow+"💰 Oboles total : %d pièces.\n"+Reset, c.Joueur.Argent)
 			fmt.Println(Magenta + "============================================================" + Reset)
+
 			break
 		}
 
-		// Tour du monstre
 		c.TourMonstre()
 
 		if c.Joueur.PV <= 0 {
-			fmt.Println("\n" + Magenta + "============================================================" + Reset)
-			fmt.Printf(Bold+Red+"💀 DÉFAITE... %s a été terrassé par %s.\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
-			fmt.Println(Magenta + "============================================================" + Reset)
 			break
 		}
 
 		c.Tour++
+	}
+
+	// --- DÉSACTIVATION AUTOMATIQUE DU POISON EN FIN DE COMBAT ---
+	c.Monstre.EstEmpoisonne = false
+	c.Monstre.DegatsPoison = 0
+
+	// Vérification finale victoire/défaite
+	if c.Monstre.PV <= 0 {
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
+		fmt.Println(Magenta + "============================================================" + Reset)
+	} else {
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Printf(Bold+Red+"💀 DÉFAITE... %s a été terrassé par %s.\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
+		fmt.Println(Magenta + "============================================================" + Reset)
 	}
 }
 
@@ -123,7 +151,7 @@ func (c *Combat) TourJoueur() {
 				fmt.Println(Red + "❌ Pas assez d'endurance pour lancer cette compétence !" + Reset)
 			}
 		} else if choix == indexObjet {
-			if c.Joueur.utiliserObjetdurantcombat() {
+			if c.Joueur.utiliserObjetdurantcombat(c.Monstre) {
 				break
 			}
 		} else {
@@ -132,10 +160,10 @@ func (c *Combat) TourJoueur() {
 	}
 }
 
-func (p *Personnage) utiliserObjetdurantcombat() bool {
+func (p *Personnage) utiliserObjetdurantcombat(m *Monstre) bool {
 	potionsDispo := []string{}
 	for nom, qte := range p.Inventaire {
-		if qte > 0 && (nom == "Potion de vie (+)" || nom == "Potion de vie (++)" || nom == "Potion d'attaque (+)" || nom == "Potion de défense (+)") {
+		if qte > 0 && (nom == "Potion de vie (+)" || nom == "Potion de vie (++)" || nom == "Potion d'attaque (+)" || nom == "Potion de défense (+)" || nom == "Potion de poison (+)" || nom == "Potion de poison (++)") {
 			potionsDispo = append(potionsDispo, nom)
 		}
 	}
@@ -170,19 +198,23 @@ func (p *Personnage) utiliserObjetdurantcombat() bool {
 		if p.PV > p.PVMax {
 			p.PV = p.PVMax
 		}
-		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (+) et regagné 30 PV !" + Reset)
+		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (+) (+30 PV) !" + Reset)
 	case "Potion de vie (++)":
 		p.PV += 100
 		if p.PV > p.PVMax {
 			p.PV = p.PVMax
 		}
-		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) et regagné 100 PV !" + Reset)
+		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) (+100 PV) !" + Reset)
 	case "Potion d'attaque (+)":
-		p.Attaque += 5
-		fmt.Println(Yellow + "🧪 Vous avez bu une Potion d'attaque (+). Votre attaque augmente de 5 !" + Reset)
+		p.Attaque += 10
+		fmt.Println(Yellow + "🧪 Attaque augmentée de 10 !" + Reset)
 	case "Potion de défense (+)":
-		p.Defense += 5
-		fmt.Println(Blue + "🧪 Vous avez bu une Potion de défense (+). Votre défense augmente de 5 !" + Reset)
+		p.Defense += 10
+		fmt.Println(Blue + "🧪 Défense augmentée de 10 !" + Reset)
+	case "Potion de poison (+)":
+		p.PotionPoisonPlus(m)
+	case "Potion de poison (++)":
+		p.PotionPoisonPlusPlus(m)
 	}
 
 	p.Inventaire[nomChoisi]--

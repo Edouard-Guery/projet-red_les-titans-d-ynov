@@ -126,3 +126,15 @@ func (p *Personnage) PotionBaisseAttaque(m *Personnage) {
 func (p *Personnage) PotionBaisseDefense(m *Personnage) {
 	m.Defense -= 10
 }
+
+func (p Personnage) PotionPoisonPlus(m *Monstre) {
+	m.EstEmpoisonne = true
+	m.DegatsPoison = 15
+	fmt.Println(Bold + Green + "🧪 [Poison+] L'ennemi est empoisonné (15 PV/tour) !" + Reset)
+}
+
+func (p Personnage) PotionPoisonPlusPlus(m *Monstr {
+	m.EstEmpoisonne = true
+	m.DegatsPoison = 35
+	fmt.Println(Bold + Red + "🧪 [Poison++] L'ennemi subit un poison violent (35 PV/tour) !" + Reset)
+}
