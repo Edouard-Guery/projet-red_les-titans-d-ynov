@@ -30,7 +30,7 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 		fmt.Println(Gray + " 11. Quitter la boutique" + Reset)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
-		fmt.Print(Cyan + "👉 Votre choix : " + Reset)
+		fmt.Print(Cyan + "👉 Ton verdict : " + Reset)
 		if !scanner.Scan() {
 			break
 		}

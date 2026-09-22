@@ -223,7 +223,7 @@ func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
 		fmt.Println(White + " 2. Voir mon inventaire" + Reset)
 		fmt.Println(Gray + " 3. Quitter la forge" + Reset)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
-		fmt.Print(Cyan + "👉 " + Reset)
+		fmt.Print(Cyan + "👉 Quelle est ta volonté ? " + Reset)
 
 		if !scanner.Scan() {
 			return

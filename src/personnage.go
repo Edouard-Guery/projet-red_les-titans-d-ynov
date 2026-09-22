@@ -110,7 +110,7 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 	p.Defense += 3
 
 	fmt.Println("\n" + Magenta + "============================================================" + Reset)
-	fmt.Printf(Bold+Yellow+"🎉 LEVEL UP ! Vous êtes maintenant niveau %d !"+Reset+"\n", p.Niveau)
+	fmt.Printf(Bold+Yellow+"🎉 LA GRÂCE DIVINE VOUS FRAPPE ! Vous voilà niveau %d !"+Reset+"\n", p.Niveau)
 	fmt.Printf(Cyan+"📈 Stats : PV Max +20 (%d) | Endu Max +10 (%d) | Attaque +5 (%d) | Défense +3 (%d)"+Reset+"\n", p.PVMax, p.EnduranceMax, p.Attaque, p.Defense)
 
 	// Sélection de 3 attaques inédites dans le pool
@@ -130,7 +130,7 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 
 	// S'il n'y a plus d'attaques à apprendre
 	if len(options) == 0 {
-		fmt.Println(Gray + "📚 Vous maîtrisez déjà toutes les compétences disponibles !" + Reset)
+		fmt.Println(Gray + "📚 Les dieux n'ont plus rien à t'enseigner !" + Reset)
 		fmt.Println(Magenta + "============================================================" + Reset)
 		return
 	}
@@ -141,14 +141,14 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 		options = options[:3]
 	}
 
-	fmt.Println("\n" + Blue + "✨ Choisissez une nouvelle attaque à apprendre :" + Reset)
+	fmt.Println("\n" + Blue + "✨ Invoque un nouvel art du combat auprès du maître :" + Reset)
 	for i, opt := range options {
 		fmt.Printf(White+" %d. %s "+Gray+"(Dégâts: %d | Soin: %d | Def: %d | Endu: %d)"+Reset+"\n", i+1, opt.Nom, opt.Dommage, opt.regeneration, opt.defense, opt.CoutEndurance)
 	}
 
 	var choix int
 	for {
-		fmt.Print(Cyan + "👉 Votre choix (1, 2 ou 3) : " + Reset)
+		fmt.Print(Cyan + "👉 Quelle voie empruntes-tu ? (1, 2 ou 3) : " + Reset)
 		if scanner.Scan() {
 			saisie := strings.TrimSpace(scanner.Text())
 			val, err := strconv.Atoi(saisie)

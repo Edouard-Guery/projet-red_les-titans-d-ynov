@@ -132,7 +132,7 @@ func main() {
 			}
 
 		case "magasin", "shop":
-			AfficherItem()
+			AfficherItem(&hero)
 			monstreActuel := Personnage{Nom: "Cible", PV: 100, Attaque: 10, Defense: 10}
 			ChoisirItem(&hero, &monstreActuel, scanner)
 

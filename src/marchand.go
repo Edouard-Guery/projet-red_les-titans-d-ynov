@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-func AfficherItem() {
+func AfficherItem(hero *Personnage) {
 	items := BoutiqueMarchand()
 	
 	fmt.Println("\n" + Magenta + "============================================================" + Reset)
 	fmt.Println(Bold + Yellow + "          🏛️  BOUTIQUE DES ÉQUIPEMENTS MYTHOLOGIQUES 🏛️          " + Reset)
 	fmt.Println(Magenta + "============================================================" + Reset)
-	
+	fmt.Printf(Cyan+"💰 Argent : %d Oboles\n"+Reset, hero.Argent)
 	for i, eq := range items {
 		fmt.Printf(White+" %2d. "+Green+"%s "+Cyan+"(%s)"+White+" — "+Yellow+"%d Oboles\n"+Reset, i+1, eq.Nom, eq.Source, eq.Prix)
 		fmt.Printf(Gray+"     └─ %s\n"+Reset, eq.Description)
@@ -22,6 +22,10 @@ func AfficherItem() {
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 	fmt.Println(Gray + " 16. Quitter la boutique" + Reset)
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+}
+
+func joueurStats() any {
+	panic("unimplemented")
 }
 
 func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) {
