@@ -7,51 +7,67 @@ import (
 	"strings"
 )
 
-func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) {
-		fmt.Print("Entre un chiffre : ")
+func AfficherItem() {
+	items := BoutiqueMarchand()
+	
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+	fmt.Println(Bold + Yellow + "          🏛️  BOUTIQUE DES ÉQUIPEMENTS MYTHOLOGIQUES 🏛️          " + Reset)
+	fmt.Println(Magenta + "============================================================" + Reset)
+	
+	for i, eq := range items {
+		fmt.Printf(White+" %2d. "+Green+"%s "+Cyan+"(%s)"+White+" — "+Yellow+"%d Oboles\n"+Reset, i+1, eq.Nom, eq.Source, eq.Prix)
+		fmt.Printf(Gray+"     └─ %s\n"+Reset, eq.Description)
+	}
+	
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+	fmt.Println(Gray + " 15. Quitter la boutique" + Reset)
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+}
 
-	// Utilisation du scanner pour éviter le bug du saut de ligne
+func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) {
+	fmt.Print(Cyan + "👉 Entre le numéro de l'équipement souhaité : " + Reset)
+
 	if !scanner.Scan() {
 		return
 	}
+
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+
 	choixStr := strings.TrimSpace(scanner.Text())
 	nombre, err := strconv.Atoi(choixStr)
 
 	if err != nil {
-		fmt.Println("Choix invalide !")
+		fmt.Println(Red + "❌ Choix invalide !" + Reset)
 		return
 	}
 
 	if nombre == 15 {
+		fmt.Println(Gray + "👋 Vous quittez la boutique des équipements." + Reset)
 		return
 	}
 
 	items := BoutiqueMarchand()
 	if nombre < 1 || nombre > len(items) {
-		fmt.Println("Choix invalide !")
+		fmt.Println(Red + "❌ Choix invalide !" + Reset)
 		return
 	}
 
 	itemChoisi := items[nombre-1]
 
-	// 1. Vérification de la place dans le sac à dos (Limite de 10)
 	if hero.nombreObjets() >= hero.CapaciteMax {
-		fmt.Println("Erreur : Votre inventaire est plein.")
+		fmt.Printf(Red+"❌ Erreur : Votre inventaire est plein (%d/%d objets max).\n"+Reset, hero.nombreObjets(), hero.CapaciteMax)
 		return
 	}
 
-	// 2. Vérification de la monnaie
 	if hero.Argent < itemChoisi.Prix {
-		fmt.Printf("Erreur : Il vous manque %d Oboles.\n", itemChoisi.Prix-hero.Argent)
+		fmt.Printf(Red+"❌ Erreur : Il vous manque %d Oboles.\n"+Reset, itemChoisi.Prix-hero.Argent)
 		return
 	}
 
-	// 3. Achat : Déduction des Oboles et ajout dans la map de l'inventaire
 	hero.Argent -= itemChoisi.Prix
 	hero.Inventaire[itemChoisi.Nom]++
-	fmt.Printf("Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n", itemChoisi.Nom, itemChoisi.Prix)
+	fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
 
-	// 4. Code original conservé : application de l'effet magique
 	switch nombre {
 	case 1:
 		hero.BouclierEclair()
@@ -82,14 +98,4 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 	case 14:
 		hero.BouclierBoisRenforce()
 	}
-}
-
-func AfficherItem() {
-	items := BoutiqueMarchand()
-	fmt.Println("=== BOUTIQUE DES ÉQUIPEMENTS MYTHOLOGIQUES ===")
-	for i, eq := range items {
-		fmt.Printf("%d. %s (%s) — %d Oboles\n   └─ %s\n\n",
-			i+1, eq.Nom, eq.Source, eq.Prix, eq.Description)
-	}
-	fmt.Println("15. annuler")
 }

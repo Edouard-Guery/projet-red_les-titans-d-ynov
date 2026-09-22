@@ -16,9 +16,9 @@ type Recette struct {
 	Cout        int
 }
 
-// NOTE : La structure Joueur a été retirée car elle fait doublon avec Personnage de ton fichier personnage.go
 
-func recettesForgeron() []Recette { // renvoie une liste de recettes. []Recette veut dire tableau
+
+func recettesForgeron() []Recette {
 	return []Recette{
 		// Tier 1
 		{

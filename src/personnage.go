@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ type Personnage struct {
 	Inventaire             map[string]int
 	CapaciteMax            int
 	Niveau                 int
-	AttaquesApprises       []attaque // Liste des attaques débloquées
+	AttaquesApprises       []attaque
 }
 
 func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Personnage {
@@ -68,8 +69,8 @@ func Person(nomSaisi string, classeSaisie string, scanner *bufio.Scanner) Person
 			return joueur
 
 		default:
-			fmt.Println("Classe inconnue. Choisissez une classe valide : creature, demi-dieu, dieu")
-			fmt.Print("> ")
+			fmt.Println(Red + "❌ Classe inconnue. Choisissez une classe valide : creature, demi-dieu, dieu" + Reset)
+			fmt.Print(Cyan + "👉 " + Reset)
 			if scanner.Scan() {
 				classe = strings.ToLower(strings.TrimSpace(scanner.Text()))
 			}
@@ -97,8 +98,9 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 	p.Attaque += 5
 	p.Defense += 3
 
-	fmt.Printf("\n🎉 LEVEL UP ! Vous êtes maintenant niveau %d !\n", p.Niveau)
-	fmt.Printf("   Stats augmentées : PV Max +20 (%d) | Attaque +5 (%d) | Défense +3 (%d)\n", p.PVMax, p.Attaque, p.Defense)
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+	fmt.Printf(Bold+Yellow+"🎉 LEVEL UP ! Vous êtes maintenant niveau %d !"+Reset+"\n", p.Niveau)
+	fmt.Printf(Cyan+"📈 Stats augmentées : PV Max +20 (%d) | Attaque +5 (%d) | Défense +3 (%d)"+Reset+"\n", p.PVMax, p.Attaque, p.Defense)
 
 	// Sélection de 3 attaques inédites dans le pool
 	options := []attaque{}
@@ -117,7 +119,8 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 
 	// S'il n'y a plus d'attaques à apprendre
 	if len(options) == 0 {
-		fmt.Println("Vous maîtrisez déjà toutes les compétences disponibles !")
+		fmt.Println(Gray + "📚 Vous maîtrisez déjà toutes les compétences disponibles !" + Reset)
+		fmt.Println(Magenta + "============================================================" + Reset)
 		return
 	}
 
@@ -127,23 +130,27 @@ func (p *Personnage) GagnerNiveau(scanner *bufio.Scanner) {
 		options = options[:3]
 	}
 
-	fmt.Println("\n✨ Choisissez une nouvelle attaque à apprendre :")
+	fmt.Println("\n" + Blue + "✨ Choisissez une nouvelle attaque à apprendre :" + Reset)
 	for i, opt := range options {
-		fmt.Printf("%d. %s (Dégâts: %d | Soin: %d | Def: %d)\n", i+1, opt.Nom, opt.Dommage, opt.regeneration, opt.defense)
+		fmt.Printf(White+" %d. %s "+Gray+"(Dégâts: %d | Soin: %d | Def: %d)"+Reset+"\n", i+1, opt.Nom, opt.Dommage, opt.regeneration, opt.defense)
 	}
 
 	var choix int
 	for {
-		fmt.Print("Votre choix (1, 2 ou 3) : ")
+		fmt.Print(Cyan + "👉 Votre choix (1, 2 ou 3) : " + Reset)
 		if scanner.Scan() {
-			fmt.Sscanf(scanner.Text(), "%d", &choix)
-			if choix >= 1 && choix <= len(options) {
+			saisie := strings.TrimSpace(scanner.Text())
+			val, err := strconv.Atoi(saisie)
+			
+			if err == nil && val >= 1 && val <= len(options) {
+				choix = val
 				attaqueChoisie := options[choix-1]
 				p.AttaquesApprises = append(p.AttaquesApprises, attaqueChoisie)
-				fmt.Printf("📖 Vous avez appris [%s] !\n", attaqueChoisie.Nom)
+				fmt.Printf("\n"+Green+"📖 Vous avez appris [%s] !"+Reset+"\n", attaqueChoisie.Nom)
 				break
 			}
 		}
-		fmt.Println("Choix invalide.")
+		fmt.Println(Red + "❌ Choix invalide. Veuillez entrer un numéro valide." + Reset)
 	}
+	fmt.Println(Magenta + "============================================================" + Reset)
 }

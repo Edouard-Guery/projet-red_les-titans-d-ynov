@@ -1,30 +1,51 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-func (p *Personnage) ShopPotions() {
-	var choix int
-
+func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 	for {
-		fmt.Println("\n=== MAGASIN DE POTIONS (DIONYSOS) ===")
-		fmt.Printf("Oboles : %d | Inventaire : %d/10\n\n", p.Argent, p.nombreObjets())
+		// En-tête stylisée
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Println(Bold + Green + "              🍷 MAGASIN DE POTIONS DE DIONYSOS 🍷              " + Reset)
+		fmt.Println(Magenta + "============================================================" + Reset)
+		fmt.Printf(Cyan+"💰 Oboles : %d | 🎒 Inventaire : %d/%d\n"+Reset, p.Argent, p.nombreObjets(), p.CapaciteMax)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
-		fmt.Println("1. Potion de vie (+)           - 5 Oboles")
-		fmt.Println("2. Potion de vie (++)          - 15 Oboles")
-		fmt.Println("3. Potion d'attaque (+)        - 20 Oboles")
-		fmt.Println("4. Potion d'attaque (++)       - 35 Oboles")
-		fmt.Println("5. Potion baisse d'attaque (-) - 25 Oboles")
-		fmt.Println("6. Potion de défense (+)       - 20 Oboles")
-		fmt.Println("7. Potion de défense (++)      - 35 Oboles")
-		fmt.Println("8. Potion baisse défense (-)   - 25 Oboles")
-		fmt.Println("9. Potion de poison (+)        - 15 Oboles")
-		fmt.Println("10. Potion de poison (++)      - 30 Oboles")
-		fmt.Println("11. Quitter")
+		// Liste des potions alignée
+		fmt.Println(White + "  1. Potion de vie (+)           - " + Yellow + "5 Oboles" + Reset)
+		fmt.Println(White + "  2. Potion de vie (++)          - " + Yellow + "15 Oboles" + Reset)
+		fmt.Println(White + "  3. Potion d'attaque (+)        - " + Yellow + "20 Oboles" + Reset)
+		fmt.Println(White + "  4. Potion d'attaque (++)       - " + Yellow + "35 Oboles" + Reset)
+		fmt.Println(White + "  5. Potion baisse d'attaque (-) - " + Yellow + "25 Oboles" + Reset)
+		fmt.Println(White + "  6. Potion de défense (+)       - " + Yellow + "20 Oboles" + Reset)
+		fmt.Println(White + "  7. Potion de défense (++)      - " + Yellow + "35 Oboles" + Reset)
+		fmt.Println(White + "  8. Potion baisse défense (-)   - " + Yellow + "25 Oboles" + Reset)
+		fmt.Println(White + "  9. Potion de poison (+)        - " + Yellow + "15 Oboles" + Reset)
+		fmt.Println(White + " 10. Potion de poison (++)       - " + Yellow + "30 Oboles" + Reset)
+		fmt.Println(Gray + " 11. Quitter la boutique" + Reset)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
-		fmt.Print("\nChoix : ")
-		fmt.Scan(&choix)
+		fmt.Print(Cyan + "👉 Votre choix : " + Reset)
+		if !scanner.Scan() {
+			break
+		}
+
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+
+		entree := strings.TrimSpace(scanner.Text())
+		choix, err := strconv.Atoi(entree)
+		if err != nil {
+			fmt.Println(Red + "❌ Veuillez entrer un nombre valide." + Reset)
+			continue
+		}
 
 		if choix == 11 {
+			fmt.Println(Gray + "👋 Vous quittez la boutique de Dionysos." + Reset)
 			break
 		}
 
@@ -53,7 +74,7 @@ func (p *Personnage) ShopPotions() {
 		case 10:
 			nomPotion, prix = "Potion de poison (++)", 30
 		default:
-			fmt.Println("Choix invalide.")
+			fmt.Println(Red + "❌ Choix invalide." + Reset)
 			continue
 		}
 
@@ -63,14 +84,18 @@ func (p *Personnage) ShopPotions() {
 
 func (p *Personnage) acheterPotion(nom string, prix int) {
 	if p.nombreObjets() >= p.CapaciteMax {
-		fmt.Println("Erreur : Votre inventaire est plein (10 objets max).")
+		fmt.Printf(Red+"❌ Erreur : Votre inventaire est plein (%d/%d objets max).\n"+Reset, p.nombreObjets(), p.CapaciteMax)
 		return
 	}
+
 	if p.Argent >= prix {
 		p.Argent -= prix
-		p.Inventaire[nom]++ // Ajout compatible avec le système de la forge
-		fmt.Printf("Acheté : %s (-%d Oboles)\n", nom, prix)
+		if p.Inventaire == nil {
+			p.Inventaire = make(map[string]int)
+		}
+		p.Inventaire[nom]++
+		fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles)\n"+Reset, nom, prix)
 	} else {
-		fmt.Println("Erreur : Vous n'avez pas assez d'Oboles.")
+		fmt.Printf(Red+"❌ Erreur : Il vous manque %d Oboles.\n"+Reset, prix-p.Argent)
 	}
 }
