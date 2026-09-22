@@ -20,7 +20,7 @@ func AfficherItem() {
 	}
 	
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
-	fmt.Println(Gray + " 15. Quitter la boutique" + Reset)
+	fmt.Println(Gray + " 16. Quitter la boutique" + Reset)
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 }
 
@@ -41,7 +41,7 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 		return
 	}
 
-	if nombre == 15 {
+	if nombre == 16 {
 		fmt.Println(Gray + "👋 Vous quittez la boutique des équipements." + Reset)
 		return
 	}
@@ -67,6 +67,8 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 	hero.Argent -= itemChoisi.Prix
 	hero.Inventaire[itemChoisi.Nom]++
 	fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles). Ajouté à l'inventaire !\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
+	fmt.Println("15. Augmentation d'inventaire (+10 places) —  30 oboles")
+	
 
 	switch nombre {
 	case 1:
@@ -97,5 +99,33 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 		hero.GourdeRegeneration()
 	case 14:
 		hero.BouclierBoisRenforce()
+	case 15:
+		hero.upgradeInventorySlot()
 	}
+}
+
+func (p *Personnage) upgradeInventorySlot() bool {
+	const prix = 30
+
+	if p.AmeliorationsInventaire >= 3 {
+		fmt.Println("❌ Vous avez déjà acheté les 3 augmentations d'inventaire.")
+		return false
+	}
+
+	if p.Argent < prix {
+		fmt.Println("❌ Il faut 30 pièces d'or.")
+		return false
+	}
+
+	p.Argent -= prix
+	p.CapaciteMax += 10
+	p.AmeliorationsInventaire++
+
+	fmt.Printf(
+		"🎒 Inventaire augmenté : %d places (%d/3 achats).\n",
+		p.CapaciteMax,
+		p.AmeliorationsInventaire,
+	)
+
+	return true
 }

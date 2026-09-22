@@ -4,6 +4,7 @@ type Monstre struct {
 	Nom      string
 	PV       int
 	PVMax    int
+	Défense  int
 	Attaques []attaque
 	Drop     string
 }
@@ -11,6 +12,7 @@ type Monstre struct {
 // CRÉATURES
 var Orc = Monstre{
 	Nom:     "Orc",
+	Défense: 5,
 	PV:      110,
 	PVMax:   110,
 	Drop:    "Dent d'Orc",
@@ -23,6 +25,7 @@ var Orc = Monstre{
 
 var Minotaure = Monstre{
 	Nom:     "Minotaure",
+	Défense: 5,
 	PV:      75,
 	PVMax:   75,
 	Drop:    "Corne Brisée",
@@ -35,11 +38,12 @@ var Minotaure = Monstre{
 
 var Meduse = Monstre{
 	Nom:     "Méduse",
+	Défense: 5,
 	PV:      50,
-	PVMax:   50, 
+	PVMax:   50,
 	Drop:    "Œil Pétrifiant",
 	Attaques: []attaque{
-		MorsureVeneuse, // Fait référence à la variable globale dans combat.go
+		MorsureVeneuse, 
 		{Nom: "Regard de Pierre", Dommage: 30, regeneration: 0, defense: 20},
 		{Nom: "Morsure Vénéneuse", Dommage: 30, regeneration: 0, defense: 2},
 		{Nom: "Serpents sifflants", Dommage: 35, regeneration: 0, defense: 0},
@@ -48,6 +52,7 @@ var Meduse = Monstre{
 
 var Cerbere = Monstre{
 	Nom:     "Cerbère",
+	Défense: 5,
 	PV:      100,
 	PVMax:   100,
 	Drop:    "Croc Infernal",
@@ -61,6 +66,7 @@ var Cerbere = Monstre{
 
 var HydreDeLerne = Monstre{
 	Nom:     "Hydre de Lerne",
+	Défense: 5,
 	PV:      150,
 	PVMax:   150,
 	Drop:    "Écaille Régénérante",
@@ -75,6 +81,7 @@ var HydreDeLerne = Monstre{
 // DEMI-DIEUX
 var Thesee = Monstre{
 	Nom:     "Thésée",
+	Défense: 5,
 	PV:      250,
 	PVMax:   250,
 	Drop:    "Fil d'Ariane",
@@ -83,12 +90,12 @@ var Thesee = Monstre{
 		{Nom: "Estocade du Héros", Dommage: 40, regeneration: 0, defense: 10},
 		{Nom: "Coup de bouclier", Dommage: 20, regeneration: 0, defense: 30},
 		{Nom: "Lame du labyrinthe", Dommage: 40, regeneration: 5, defense: 5},
-		
 	},
 }
 
 var Persee = Monstre{
 	Nom:     "Persée",
+	Défense: 5,
 	PV:      225,
 	PVMax:   225,
 	Drop:    "Fiole de Venin",
@@ -102,6 +109,7 @@ var Persee = Monstre{
 
 var Achille = Monstre{
 	Nom:     "Achille",
+	Défense: 5,
 	PV:      275,
 	PVMax:   275,
 	Drop:    "Fragment de Lame",
@@ -115,6 +123,7 @@ var Achille = Monstre{
 
 var Heracles = Monstre{
 	Nom:     "Héraclès",
+	Défense: 5,
 	PV:      300,
 	PVMax:   300,
 	Drop:    "Peau du Lion",
@@ -129,6 +138,7 @@ var Heracles = Monstre{
 // DIEUX ET TITANS
 var Athena = Monstre{
 	Nom:     "Athéna",
+	Défense: 5,
 	PV:      400,
 	PVMax:   400,
 	Drop:    "Éclat de Bouclier",
@@ -143,6 +153,7 @@ var Athena = Monstre{
 
 var Poseidon = Monstre{
 	Nom:     "Poséidon",
+	Défense: 5,
 	PV:      425,
 	PVMax:   425,
 	Drop:    "Trident Brisé",
@@ -155,6 +166,7 @@ var Poseidon = Monstre{
 
 var Hades = Monstre{
 	Nom:     "Hadès",
+	Défense: 5,
 	PV:      440,
 	PVMax:   440,
 	Drop:    "Cendre des Enfers",
@@ -168,6 +180,7 @@ var Hades = Monstre{
 
 var Zeus = Monstre{
 	Nom:     "Zeus",
+	Défense: 5,
 	PV:      480,
 	PVMax:   480,
 	Drop:    "Éclair Figé",
@@ -182,6 +195,7 @@ var Zeus = Monstre{
 
 var Chronos = Monstre{
 	Nom:     "Chronos",
+	Défense: 5,
 	PV:      800,
 	PVMax:   800,
 	Drop:    "",

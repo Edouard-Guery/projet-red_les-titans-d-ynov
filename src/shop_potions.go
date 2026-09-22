@@ -40,7 +40,7 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 		entree := strings.TrimSpace(scanner.Text())
 		choix, err := strconv.Atoi(entree)
 		if err != nil {
-			fmt.Println(Red + "❌ Veuillez entrer un nombre valide." + Reset)
+			fmt.Println(Red + "❌ Inscris un chiffre béni des dieux." + Reset)
 			continue
 		}
 

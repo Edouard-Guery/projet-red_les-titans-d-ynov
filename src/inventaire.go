@@ -11,11 +11,15 @@ import (
 // Menu interactif pour voir et utiliser les objets de l'inventaire
 func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 	for {
-		fmt.Println("\n=== VOTRE INVENTAIRE ===")
-		fmt.Printf("Oboles : %d | Places : %d/%d\n", p.Argent, p.nombreObjets(), p.CapaciteMax)
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Println(Bold + Yellow + "                     🎒 VOTRE INVENTAIRE 🎒                     " + Reset)
+		fmt.Println(Magenta + "============================================================" + Reset)
+		fmt.Printf(Cyan+"💰 Oboles : %d | 📦 Places : %d/%d\n"+Reset, p.Argent, p.nombreObjets(), p.CapaciteMax)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
 		if len(p.Inventaire) == 0 {
-			fmt.Println("Votre inventaire est vide.")
+			fmt.Println(Gray + " Votre inventaire est vide." + Reset)
+			fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 			return
 		}
 
@@ -26,26 +30,33 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 		}
 		sort.Strings(noms)
 
-		fmt.Println("Objets disponibles :")
+		fmt.Println(White + " Objets disponibles :" + Reset)
 		for i, nom := range noms {
-			fmt.Printf("%d. %s (x%d)\n", i+1, nom, p.Inventaire[nom])
+			fmt.Printf(White+" %2d. %s "+Cyan+"(x%d)\n"+Reset, i+1, nom, p.Inventaire[nom])
 		}
 
-		fmt.Println("\n0. Fermer l'inventaire")
-		fmt.Print("> Entrez le numéro de l'objet à utiliser : ")
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Println(Gray + "  0. Fermer l'inventaire" + Reset)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Print(Cyan + "👉 Entrez le numéro de l'objet à utiliser : " + Reset)
 
 		if !scanner.Scan() {
 			return
 		}
+
+		// Séparation visuelle après la saisie
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+
 		choix := strings.TrimSpace(scanner.Text())
 
 		if choix == "0" {
+			fmt.Println(Gray + "🎒 Vous fermez votre sac." + Reset)
 			return
 		}
 
 		index, err := strconv.Atoi(choix)
 		if err != nil || index < 1 || index > len(noms) {
-			fmt.Println("Choix invalide.")
+			fmt.Println(Red + "❌ Choix invalide." + Reset)
 			continue
 		}
 
@@ -56,22 +67,27 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 
 // Applique l'effet de l'objet et le retire de l'inventaire
 func (p *Personnage) utiliserObjet(nom string) {
+	// Permet d'équiper les armures de la forge ! (Redirige vers equipement.go)
+	if p.UtiliserEquipementForge(nom) {
+		return
+	}
+
 	switch nom {
 	case "Potion de vie (+)":
 		p.PotionViePlus() // Fonction située dans effets.go
-		fmt.Println("Vous avez bu une Potion de vie (+) et regagné 30 PV !")
+		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (+) et regagné 30 PV !" + Reset)
 	case "Potion de vie (++)":
 		p.PotionViePlusPlus()
-		fmt.Println("Vous avez bu une Potion de vie (++) et regagné 100 PV !")
+		fmt.Println(Green + "🧪 Vous avez bu une Potion de vie (++) et regagné 100 PV !" + Reset)
 	case "Potion d'attaque (+)":
 		p.PotionAttaquePlus()
-		fmt.Println("Vous avez bu une Potion d'attaque (+). Votre attaque augmente !")
+		fmt.Println(Yellow + "🧪 Vous avez bu une Potion d'attaque (+). Votre attaque augmente !" + Reset)
 	case "Potion de défense (+)":
 		p.PotionDefensePlus()
-		fmt.Println("Vous avez bu une Potion de défense (+). Votre défense augmente !")
+		fmt.Println(Blue + "🧪 Vous avez bu une Potion de défense (+). Votre défense augmente !" + Reset)
 	default:
-		// Si l'objet n'est pas utilisable (comme les matériaux de forge)
-		fmt.Printf("Vous ne pouvez pas utiliser '%s' directement ici.\n", nom)
+		// Si l'objet n'est pas utilisable (comme les matériaux de forge ou un objet passif)
+		fmt.Printf(Red+"❌ Vous ne pouvez pas utiliser '%s' directement ici.\n"+Reset, nom)
 		return
 	}
 
@@ -84,9 +100,9 @@ func (p *Personnage) utiliserObjet(nom string) {
 
 func (p *Personnage) UpgradeInventorySlot() {
 	if p.CapaciteMax >= 40 {
-		fmt.Println("Votre inventaire est déjà à sa taille maximale.")
+		fmt.Println(Red + "❌ Votre inventaire est déjà à sa taille maximale." + Reset)
 		return
 	}
 	p.CapaciteMax += 10
-	fmt.Printf("Succès ! Votre inventaire a été agrandi. Capacité actuelle : %d places.\n", p.CapaciteMax)
+	fmt.Printf(Green+"✅ Succès ! Votre inventaire a été agrandi. Capacité actuelle : %d places.\n"+Reset, p.CapaciteMax)
 }

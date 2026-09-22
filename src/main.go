@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -17,6 +19,18 @@ var Magenta = "\033[35m"
 var Cyan = "\033[36m"
 var Gray = "\033[37m"
 var White = "\033[97m"
+
+// Fonction pour nettoyer le terminal selon le système d'exploitation
+func clearScreen() {
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", "cls")
+	} else {
+		cmd = exec.Command("clear")
+	}
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -54,8 +68,8 @@ func main() {
 		// Menu stylisé
 		fmt.Println("\n" + Blue + "-----------------------------------------------------------------------" + Reset)
 		fmt.Println(Yellow + "📜 Que souhaitez-vous faire ?" + Reset)
-		fmt.Println(White + " 🗡️  start      🎒 inv       🛒 shop      🎲 casino" + Reset)
-		fmt.Println(White + " 🧪 potions    ⚒️  forge     ℹ️  info      🪙  autel	❌ quit" + Reset)
+		fmt.Println(White + " 🗡️  start      🎒 inv       🛒 shop      🎯 entrainement  🎲 casino" + Reset)
+		fmt.Println(White + " 🧪 potions    ⚒️  forge     ℹ️  info      🪙  autel         ❌ quit" + Reset)
 		fmt.Println(Blue + "-----------------------------------------------------------------------" + Reset)
 		fmt.Print(Cyan + "👉 " + Reset)
 
@@ -68,6 +82,11 @@ func main() {
 		commande := strings.TrimSpace(strings.ToLower(scanner.Text()))
 
 		switch commande {
+		// --- COMMANDE CACHÉE ---
+		case "clear":
+			clearScreen()
+			fmt.Println(Green + "✨ Le terminal a été purifié par les Dieux." + Reset)
+
 		case "inv", "inventaire", "inv-list":
 			hero.MenuInventaire(scanner)
 
@@ -124,15 +143,21 @@ func main() {
 			hero.ShopPotions(scanner)
 
 		case "stop", "end", "info":
-			fmt.Printf("\n"+Cyan+"📊 Stats - Nom: %s | Classe: %s | PV: %d/%d | Attaque: %d | Défense: %d | Oboles: %d"+Reset+"\n",
-				hero.Nom, hero.Classe, hero.PV, hero.PVMax, hero.Attaque, hero.Defense, hero.Argent)
+			fmt.Printf("\n"+Cyan+"📊 Stats - Nom: %s | Classe: %s | PV: %d/%d | ⚡ Endu: %d/%d | Attaque: %d | Défense: %d | Oboles: %d"+Reset+"\n",
+				hero.Nom, hero.Classe, hero.PV, hero.PVMax, hero.Endurance, hero.EnduranceMax, hero.Attaque, hero.Defense, hero.Argent)
+			// --- EASTER EGG ---
+			fmt.Println(Magenta + "🎵 Easter Egg : Jeu certifié par ABBA et Steven Spielberg 🎬" + Reset)
 
 		case "quit", "disconnect":
 			fmt.Println("\n" + Green + "👋 Merci d'avoir joué ! À bientôt dans l'Olympe." + Reset)
 			os.Exit(0)
 
+		case "training", "train", "entrainement":
+			trainingFight(&hero, scanner)
+
 		case "casino":
 			casino(&hero)
+
 		case "autel":
 			autel(&hero, scanner)
 
@@ -142,7 +167,7 @@ func main() {
 	}
 }
 
-// Fonction corrigée pour éviter les crashs de l'IA lors des combats
+// Fonction pour lier la logique de combat depuis le main
 func NouveauCombatMonstre(personnage *Personnage, monstre *Monstre) *Combat {
 	return &Combat{
 		Joueur:  personnage,

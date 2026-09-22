@@ -1,22 +1,19 @@
-// CLOVIS
 package main
 
 import (
-	"bufio" // permet de lire ce que le joueur tape dans le terminal.
+	"bufio"
 	"fmt"
-	"sort"    // trie les objets par ordre alphabétique dans le sac à dos et les ingrédients dans les recettes
-	"strconv" // transforme le texte tapé par le joueur (par exemple "2") en nombre 2.
-	"strings" // enlève les espaces inutiles avec TrimSpace et rassemble une liste de textes avec Join.
+	"sort"
+	"strconv"
+	"strings"
 )
 
 type Recette struct {
 	Nom         string
 	Tier        string
-	Ingredients map[string]int // map sert ici à mémoriser tous les objets du joueur et combien il en possède (façon de stocker une liste avec une étiquette et une valeur)
+	Ingredients map[string]int
 	Cout        int
 }
-
-
 
 func recettesForgeron() []Recette {
 	return []Recette{
@@ -25,7 +22,7 @@ func recettesForgeron() []Recette {
 			Nom:         "Cuirasse Sauvage",
 			Tier:        "Tier 1",
 			Ingredients: map[string]int{"Dent d'Orc": 1, "Corne Brisée": 1},
-			Cout:        5, // crée une recette // les tiers servent à organiser l’affichage.
+			Cout:        5,
 		},
 		{
 			Nom:         "Regard Infernal",
@@ -85,55 +82,53 @@ func recettesForgeron() []Recette {
 	}
 }
 
-func (p *Personnage) nombreObjets() int { // p *Personnage signifie que la fonction travaille sur un joueur précis. Le * est un pointeur : la fonction accède au vrai joueur, pas à une copie.
+func (p *Personnage) nombreObjets() int {
 	total := 0
-
 	for _, quantite := range p.Inventaire {
 		total += quantite
 	}
-
 	return total
 }
 
 func (p *Personnage) peutForger(recette Recette) error {
-	if p.Argent < recette.Cout { // si le joueur a moins d’Oboles que le prix de la recette, la forge est refusée
+	if p.Argent < recette.Cout {
 		return fmt.Errorf(
-			"Vous n'avez pas assez d'Oboles : il faut %d Oboles, mais vous en avez %d.",
+			Red+"❌ Vous n'avez pas assez d'Oboles : il faut %d Oboles, mais vous en avez %d."+Reset,
 			recette.Cout,
 			p.Argent,
 		)
 	}
 
-	manquants := []string{} // crée une liste vide qui contiendra les ressources manquantes
+	manquants := []string{}
 
-	for ingredient, quantiteRequise := range recette.Ingredients { // Parcourt chaque matériau de la recette
-		quantitePossedee := p.Inventaire[ingredient] // Récupère la quantité possédée dans le sac
+	for ingredient, quantiteRequise := range recette.Ingredients {
+		quantitePossedee := p.Inventaire[ingredient]
 
-		if quantitePossedee < quantiteRequise { // si le joueur n’a pas assez de cet ingrédient = il manque quelque chose
+		if quantitePossedee < quantiteRequise {
 			manquants = append(
 				manquants,
-				fmt.Sprintf("%dx %s", quantiteRequise-quantitePossedee, ingredient), // ajoute un texte à la liste
+				fmt.Sprintf("%dx %s", quantiteRequise-quantitePossedee, ingredient),
 			)
 		}
 	}
 
 	if len(manquants) > 0 {
 		return fmt.Errorf(
-			"Vous n'avez pas les ressources nécessaires : %s.",
-			strings.Join(manquants, ", "), // join = il rassemble plusieurs textes en un seul, séparés par ", " pour éviter de répéter toujours les mêmes choses
+			Red+"❌ Vous n'avez pas les ressources nécessaires : %s."+Reset,
+			strings.Join(manquants, ", "),
 		)
 	}
 
-	nombreIngredients := 0 // compte combien d’objets seront retirés.
+	nombreIngredients := 0
 	for _, quantite := range recette.Ingredients {
 		nombreIngredients += quantite
 	}
 
-	nombreApresFabrication := p.nombreObjets() - nombreIngredients + 1 // Calcule le contenu du sac après la fabrication
+	nombreApresFabrication := p.nombreObjets() - nombreIngredients + 1
 
-	if nombreApresFabrication > p.CapaciteMax { // Si le total prévu dépasse la capacité, la forge est refusée.
+	if nombreApresFabrication > p.CapaciteMax {
 		return fmt.Errorf(
-			"Votre iventaire est plein (%d/%d objets).",
+			Red+"❌ Votre inventaire est plein (%d/%d objets)."+Reset,
 			p.nombreObjets(),
 			p.CapaciteMax,
 		)
@@ -143,72 +138,72 @@ func (p *Personnage) peutForger(recette Recette) error {
 }
 
 func (p *Personnage) forger(recette Recette) error {
-	if err := p.peutForger(recette); err != nil { // err := crée une variable d’erreur. // Si err != nil, il y a une erreur. // return err arrête la fonction sans modifier le joueur.
+	if err := p.peutForger(recette); err != nil {
 		return err
 	}
 
-	for ingredient, quantite := range recette.Ingredients { // Pour chaque ingrédient, la quantité requise est retirée du sac.
+	for ingredient, quantite := range recette.Ingredients {
 		p.Inventaire[ingredient] -= quantite
-
-		if p.Inventaire[ingredient] <= 0 { // Si l’objet arrive à zéro, il est supprimé de la map.
+		if p.Inventaire[ingredient] <= 0 {
 			delete(p.Inventaire, ingredient)
 		}
 	}
 
-	p.Argent -= recette.Cout    // Retire les x Oboles.
-	p.Inventaire[recette.Nom]++ // Ajoute l’objet forgé
+	p.Argent -= recette.Cout
+	p.Inventaire[recette.Nom]++
 
-	return nil // La forge a réussi.
+	return nil
 }
 
-func texteIngredients(ingredients map[string]int) string { // fonction transforme les ingrédients d’une recette en phrase lisible
-	noms := make([]string, 0, len(ingredients)) // Crée une liste de noms vide, avec une capacité prévue égale au nombre d’ingrédients
+func texteIngredients(ingredients map[string]int) string {
+	noms := make([]string, 0, len(ingredients))
 
-	for nom := range ingredients { // Récupère tous les noms d’ingrédients
-		noms = append(noms, nom)
-	}
-
-	sort.Strings(noms) // Les trie par ordre alphabétique.
-
-	resultat := []string{} // Crée une liste de textes.
-	for _, nom := range noms {
-		resultat = append(resultat, fmt.Sprintf("%dx %s", ingredients[nom], nom)) // Transforme les noms en texte
-	}
-
-	return strings.Join(resultat, " + ")
-}
-
-func afficherInventaire(p *Personnage) { // Affiche l’or, la capacité et le contenu du sac.
-	fmt.Println("\n--- INVENTAIRE ---")
-	fmt.Printf("Argent : %d Oboles\n", p.Argent)
-	fmt.Printf("Places : %d/%d\n", p.nombreObjets(), p.CapaciteMax)
-
-	if len(p.Inventaire) == 0 { // Si la map est vide, le sac est vide
-		fmt.Println("Iventaire vide.")
-		return
-	}
-
-	noms := make([]string, 0, len(p.Inventaire)) // Crée une liste pour récupérer les noms des objets.
-
-	for nom := range p.Inventaire { // Trie puis affiche
+	for nom := range ingredients {
 		noms = append(noms, nom)
 	}
 
 	sort.Strings(noms)
 
+	resultat := []string{}
 	for _, nom := range noms {
-		fmt.Printf("- %s x%d\n", nom, p.Inventaire[nom])
+		resultat = append(resultat, fmt.Sprintf(Cyan+"%dx"+Reset+" %s", ingredients[nom], nom))
 	}
+
+	return strings.Join(resultat, " + ")
 }
 
-func afficherRecettesTier(recettes []Recette, tier string) { // Reçoit la liste entière des recettes et le tier demandé.
-	fmt.Printf("\n--- %s ---\n", tier)
+func afficherInventaire(p *Personnage) {
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+	fmt.Println(Bold + Yellow + "                       🎒 VOTRE SAC                       " + Reset)
+	fmt.Println(Magenta + "============================================================" + Reset)
+	fmt.Printf(Cyan+"💰 Argent : %d Oboles | 📦 Places : %d/%d\n"+Reset, p.Argent, p.nombreObjets(), p.CapaciteMax)
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+
+	if len(p.Inventaire) == 0 {
+		fmt.Println(Gray + " Votre inventaire est vide." + Reset)
+		return
+	}
+
+	noms := make([]string, 0, len(p.Inventaire))
+	for nom := range p.Inventaire {
+		noms = append(noms, nom)
+	}
+	sort.Strings(noms)
+
+	for _, nom := range noms {
+		fmt.Printf(White+" - %s "+Cyan+"x%d\n"+Reset, nom, p.Inventaire[nom])
+	}
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+}
+
+func afficherRecettesTier(recettes []Recette, tier string) {
+	fmt.Printf("\n"+Bold+Yellow+"--- ⚜️  %s ⚜️  ---"+Reset+"\n", tier)
 
 	for index, recette := range recettes {
-		if recette.Tier == tier { // N’affiche que les recettes du tier concerné.
+		if recette.Tier == tier {
 			fmt.Printf(
-				"%d. %s\n   Matériaux : %s\n   Prix : %d Oboles\n",
-				index+1, // Sert à afficher le choix du joueur
+				White+" %2d. "+Green+"%s\n"+Gray+"     Matériaux : %s\n"+Gray+"     Prix : "+Yellow+"%d Oboles\n"+Reset,
+				index+1,
 				recette.Nom,
 				texteIngredients(recette.Ingredients),
 				recette.Cout,
@@ -217,82 +212,90 @@ func afficherRecettesTier(recettes []Recette, tier string) { // Reçoit la liste
 	}
 }
 
-// menuForgeron : Le nouveau "vestibule" de la forge
 func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
-	for { // menu principal de la forge, tourne en boucle
-		fmt.Println()
-		fmt.Println("========== LE VESTIBULE DE LA FORGE ==========")
-		fmt.Printf("Argent : %d Oboles\n", p.Argent)
-		fmt.Println("1. Parler à Hephaistos le forgeron")
-		fmt.Println("2. Voir mon iventaire")
-		fmt.Println("3. Quitter la forge")
-		fmt.Print("> ")
+	for {
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Println(Bold + Red + "               🔥 LE VESTIBULE DE LA FORGE 🔥               " + Reset)
+		fmt.Println(Magenta + "============================================================" + Reset)
+		fmt.Printf(Cyan+"💰 Argent : %d Oboles\n"+Reset, p.Argent)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Println(White + " 1. Parler à Héphaïstos le forgeron" + Reset)
+		fmt.Println(White + " 2. Voir mon inventaire" + Reset)
+		fmt.Println(Gray + " 3. Quitter la forge" + Reset)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Print(Cyan + "👉 " + Reset)
 
 		if !scanner.Scan() {
 			return
 		}
+		
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
 		switch strings.TrimSpace(scanner.Text()) {
 		case "1":
-			sousMenuHephaistos(p, scanner) // Appelle la liste des recettes
+			sousMenuHephaistos(p, scanner)
 		case "2":
 			afficherInventaire(p)
-			fmt.Println("\nPrends le temps d'inspecter tes trouvailles... [Entrée]")
+			fmt.Print(Gray + "Prends le temps d'inspecter tes trouvailles... [Entrée]" + Reset)
 			scanner.Scan()
 		case "3":
-		fmt.Println("À bientôt, l'ami ! Que la faveur d'Héphaïstos t'accompagne !")
-			return // Quitte la forge et retourne au menu principal du jeu
+			fmt.Println(Green + "👋 À bientôt, l'ami ! Que la faveur d'Héphaïstos t'accompagne !" + Reset)
+			return
 		default:
-			fmt.Println("L'Olympe ne reconnaît pas ce geste.")
+			fmt.Println(Red + "❌ L'Olympe ne reconnaît pas ce geste." + Reset)
 		}
 	}
 }
 
-// sousMenuHephaistos : L'ancien menu principal du forgeron, maintenant un sous-menu
-func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) { // Cette fonction affiche les recettes et attend les choix.
-	recettes := recettesForgeron() // Charge les 9 recettes
+func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) {
+	recettes := recettesForgeron()
 
 	for {
-		fmt.Println("\n========== HEPHAISTOS LE FORGERON ==========")
-		fmt.Printf("Votre argent : %d Oboles\n", p.Argent)
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
+		fmt.Println(Bold + Red + "                 ⚒️  HÉPHAÏSTOS LE FORGERON ⚒️                 " + Reset)
+		fmt.Println(Magenta + "============================================================" + Reset)
+		fmt.Printf(Cyan+"💰 Votre argent : %d Oboles\n"+Reset, p.Argent)
 
 		afficherRecettesTier(recettes, "Tier 1")
 		afficherRecettesTier(recettes, "Tier 2")
 		afficherRecettesTier(recettes, "Tier 3")
 
-		fmt.Println("\n10. Retour au vestibule")
-		fmt.Print("> ")
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Println(Gray + " 10. Retour au vestibule" + Reset)
+		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+		fmt.Print(Cyan + "👉 Que veux-tu forger ? : " + Reset)
 
-		if !scanner.Scan() { // scanner.Scan() lit une ligne.
+		if !scanner.Scan() {
 			return
 		}
+		
+		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
-		choix := strings.TrimSpace(scanner.Text()) // scanner.Text() récupère la saisie.
+		choix := strings.TrimSpace(scanner.Text())
 
-		if choix == "10" { // Le joueur quitte la liste de craft pour retourner au vestibule.
+		if choix == "10" {
 			return
 		}
 
 		index, err := strconv.Atoi(choix)
 
-		if err != nil || index < 1 || index > len(recettes) { // Refuse les choix non numériques ou hors limites.
-			fmt.Println("L'Olympe ne reconnaît pas ce geste..")
+		if err != nil || index < 1 || index > len(recettes) {
+			fmt.Println(Red + "❌ L'Olympe ne reconnaît pas ce geste..." + Reset)
 			continue
 		}
 
 		recetteChoisie := recettes[index-1]
-
-		err = p.forger(recetteChoisie) // tente la forge
+		err = p.forger(recetteChoisie)
 
 		if err != nil {
-			fmt.Println("\nLes offrandes à la forge sont insuffisantes :", err)
+			fmt.Println(err)
 		} else {
-			fmt.Printf("\nVous avez forgé '%s' !\n", recetteChoisie.Nom)
-			fmt.Println("Vos objets ont été remis à Hephaistos le forgeron et retirés de votre inventaire..")
-			fmt.Printf("Il vous reste %d Oboles.\n", p.Argent)
+			fmt.Printf(Bold+Green+"🔨 INCROYABLE ! Vous avez forgé '%s' !"+Reset+"\n", recetteChoisie.Nom)
+			fmt.Println(Gray + "Vos objets ont été fondus par Héphaïstos et retirés de votre sac." + Reset)
+			fmt.Printf(Cyan+"Il vous reste %d Oboles.\n"+Reset, p.Argent)
 		}
 
-		fmt.Println("\nFranchis le seuil pour poursuivre ton destin... [Entrée]")
-		scanner.Scan() // met le programme en pause
+		fmt.Print(Gray + "\nFranchis le seuil pour poursuivre ton destin... [Entrée]" + Reset)
+		scanner.Scan()
 	}
 }

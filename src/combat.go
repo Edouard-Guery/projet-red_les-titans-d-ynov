@@ -3,22 +3,23 @@ package main
 import "fmt"
 
 type attaque struct {
-	Nom          string
-	Dommage      int
-	regeneration int
-	defense      int
+	Nom           string
+	Dommage       int
+	regeneration  int
+	defense       int
+	CoutEndurance int // Coût en endurance de l'attaque
 }
 
 var (
-	MorsureVeneuse    = attaque{"Morsure Vénéneuse", 15, 0, 0}
-	CoupDeBouclier    = attaque{"Coup de Bouclier", 8, 0, 12}
-	VampirismeSauvage = attaque{"Vampirisme Sauvage", 12, 6, 0}
-	FureurHeroique    = attaque{"Fureur Héroïque", 45, 10, 15}
-	EgideDeBronze     = attaque{"Égide de Bronze", 20, 15, 45}
-	EclairCeleste     = attaque{"Éclair Céleste", 65, 0, 10}
-	CataclysmeCosmique = attaque{"Cataclysme Cosmique", 150, 40, 80}
-	JugementAbsolu     = attaque{"Jugement Absolu", 250, 0, 100}
-	RenaissanceDivine  = attaque{"Renaissance Divine", 50, 150, 150}
+	MorsureVeneuse     = attaque{"Morsure Vénéneuse", 15, 0, 0, 8}
+	CoupDeBouclier     = attaque{"Coup de Bouclier", 8, 0, 12, 5}
+	VampirismeSauvage  = attaque{"Vampirisme Sauvage", 12, 6, 0, 10}
+	FureurHeroique     = attaque{"Fureur Héroïque", 45, 10, 15, 20}
+	EgideDeBronze      = attaque{"Égide de Bronze", 20, 15, 45, 15}
+	EclairCeleste      = attaque{"Éclair Céleste", 65, 0, 10, 30}
+	CataclysmeCosmique = attaque{"Cataclysme Cosmique", 150, 40, 80, 65}
+	JugementAbsolu     = attaque{"Jugement Absolu", 250, 0, 100, 90}
+	RenaissanceDivine  = attaque{"Renaissance Divine", 50, 150, 150, 100}
 )
 
 type Combat struct {
@@ -43,17 +44,23 @@ func (c *Combat) LancerDéroulement() {
 	for c.Joueur.PV > 0 && c.Monstre.PV > 0 {
 		fmt.Printf("\n"+Yellow+"--- ⏳ Tour %d ---"+Reset+"\n", c.Tour)
 
+		// On régénère 15 d'endurance par tour
+		c.Joueur.Endurance += 15
+		if c.Joueur.Endurance > c.Joueur.EnduranceMax {
+			c.Joueur.Endurance = c.Joueur.EnduranceMax
+		}
+
 		if c.Joueur.Inventaire["GourdeRegeneration"] > 0 {
 			fmt.Println(Green + "🌿 La Gourde de Régénération restaure vos PV !" + Reset)
 			c.Joueur.GourdeRegeneration()
 		}
 
-		fmt.Printf(Cyan+"👤 %s "+Reset+"| ❤️  PV : %d/%d | 🗡️  Attaque : %d | 🛡️  Défense : %d\n", c.Joueur.Nom, c.Joueur.PV, c.Joueur.PVMax, c.Joueur.Attaque, c.Joueur.Defense)
-		
-		// J'ai enlevé Attaque et Defense pour le monstre pour éviter le bug undefined
+		fmt.Printf(Cyan+"👤 %s "+Reset+"| ❤️  PV : %d/%d | ⚡ Endu : %d/%d | 🗡️  Attaque : %d | 🛡️  Défense : %d\n", c.Joueur.Nom, c.Joueur.PV, c.Joueur.PVMax, c.Joueur.Endurance, c.Joueur.EnduranceMax, c.Joueur.Attaque, c.Joueur.Defense)
 		fmt.Printf(Red+"👹 %s "+Reset+"| ❤️  PV : %d/%d\n", c.Monstre.Nom, c.Monstre.PV, c.Monstre.PVMax)
 
+		// Tour du joueur
 		c.TourJoueur()
+
 		if c.Monstre.PV <= 0 {
 			fmt.Println("\n" + Magenta + "============================================================" + Reset)
 			fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
@@ -61,18 +68,8 @@ func (c *Combat) LancerDéroulement() {
 			break
 		}
 
-		// La fonction c.TourMonstre() a été retirée pour isoler le bug
-		// On simule une attaque simple du monstre pour l'instant
-		fmt.Printf("\n"+Bold+Red+"👹 C'est au tour de %s !"+Reset+"\n", c.Monstre.Nom)
-		degatsMonstre := 15 - c.Joueur.Defense
-		if degatsMonstre < 0 {
-			degatsMonstre = 0
-		}
-		c.Joueur.PV -= degatsMonstre
-		if c.Joueur.PV < 0 {
-			c.Joueur.PV = 0
-		}
-		fmt.Printf(Red+"   💥 %s vous inflige %d dégâts !\n"+Reset, c.Monstre.Nom, degatsMonstre)
+		// Tour du monstre
+		c.TourMonstre()
 
 		if c.Joueur.PV <= 0 {
 			fmt.Println("\n" + Magenta + "============================================================" + Reset)
@@ -90,11 +87,12 @@ func (c *Combat) TourJoueur() {
 		fmt.Println("\n" + Blue + "------------------------------------------------------------" + Reset)
 		fmt.Printf(Cyan+"👤 C'est à votre tour, %s !"+Reset+"\n", c.Joueur.Nom)
 
-		fmt.Printf(White+" 1. Attaque de base (%d dégâts)\n"+Reset, c.Joueur.Attaque)
+		coutBase := 5
+		fmt.Printf(White+" 1. Attaque de base (%d dégâts, %d ⚡)\n"+Reset, c.Joueur.Attaque, coutBase)
 
 		offset := 2
 		for i, att := range c.Joueur.AttaquesApprises {
-			fmt.Printf(White+" %d. %s (%d dégâts, %d soin)\n"+Reset, i+offset, att.Nom, att.Dommage, att.regeneration)
+			fmt.Printf(White+" %d. %s (%d dégâts, %d soin, %d ⚡)\n"+Reset, i+offset, att.Nom, att.Dommage, att.regeneration, att.CoutEndurance)
 		}
 
 		indexObjet := len(c.Joueur.AttaquesApprises) + offset
@@ -108,20 +106,28 @@ func (c *Combat) TourJoueur() {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
 		if choix == 1 {
-			c.ExecuterAttaqueJoueur("Attaque de base", c.Joueur.Attaque, 0, 0)
-			break
+			if c.Joueur.Endurance >= coutBase {
+				c.Joueur.Endurance -= coutBase
+				c.ExecuterAttaqueJoueur("Attaque de base", c.Joueur.Attaque, 0, 0)
+				break
+			} else {
+				fmt.Println(Red + "❌ Pas assez d'endurance ! Choisissez une autre action." + Reset)
+			}
 		} else if choix >= offset && choix < indexObjet {
 			att := c.Joueur.AttaquesApprises[choix-offset]
-			c.ExecuterAttaqueJoueur(att.Nom, att.Dommage, att.regeneration, att.defense)
-			break
+			if c.Joueur.Endurance >= att.CoutEndurance {
+				c.Joueur.Endurance -= att.CoutEndurance
+				c.ExecuterAttaqueJoueur(att.Nom, att.Dommage, att.regeneration, att.defense)
+				break
+			} else {
+				fmt.Println(Red + "❌ Pas assez d'endurance pour lancer cette compétence !" + Reset)
+			}
 		} else if choix == indexObjet {
 			if c.Joueur.utiliserObjetdurantcombat() {
 				break
 			}
 		} else {
-			fmt.Println(Red + "❌ Choix invalide ! Vous effectuez une attaque normale." + Reset)
-			c.ExecuterAttaqueJoueur("Attaque de base", c.Joueur.Attaque, 0, 0)
-			break
+			fmt.Println(Red + "❌ Choix invalide !" + Reset)
 		}
 	}
 }
@@ -190,7 +196,6 @@ func (p *Personnage) utiliserObjetdurantcombat() bool {
 func (c *Combat) ExecuterAttaqueJoueur(nomAttaque string, degatsBruts, regen, defBonus int) {
 	fmt.Printf(Bold+Cyan+"⚔️  [JOUEUR] %s lance l'attaque [%s] !\n"+Reset, c.Joueur.Nom, nomAttaque)
 
-	// La défense du monstre est ignorée ici (fixée à 0) pour corriger le bug
 	degatsNets := degatsBruts
 	if degatsNets < 0 {
 		degatsNets = 0

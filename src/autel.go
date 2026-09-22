@@ -8,36 +8,38 @@ import (
 )
 
 func autel(joueur *Personnage, scanner *bufio.Scanner) {
-	fmt.Println("\n=== AUTEL DE ZEUS ===")
-	fmt.Printf("PV actuels : %d/%d | Oboles : %d\n", joueur.PV, joueur.PVMax, joueur.Argent)
-	fmt.Println("Combien de PV voulez-vous sacrifier ? (1 PV = 2 Oboles)")
-	fmt.Print("> ")
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+	fmt.Println(Bold + Yellow + "                   ⚡ AUTEL DE ZEUS ⚡                   " + Reset)
+	fmt.Println(Magenta + "============================================================" + Reset)
+	fmt.Printf(Cyan+"❤️  PV actuels : %d/%d | 💰 Oboles : %d\n"+Reset, joueur.PV, joueur.PVMax, joueur.Argent)
+	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
+	fmt.Println(White + "Combien de PV voulez-vous sacrifier au Dieu des Dieux ? " + Gray + "(1 PV = 2 Oboles)" + Reset)
+	fmt.Print(Cyan + "👉 " + Reset)
 
 	if !scanner.Scan() {
 		return
 	}
 
+	fmt.Println("\n" + Magenta + "============================================================" + Reset)
+
 	entree := strings.TrimSpace(scanner.Text())
 	sacrifice, err := strconv.Atoi(entree)
 
-	// Empêche les entrées invalides ou les nombres négatifs
 	if err != nil || sacrifice <= 0 {
-		fmt.Println("Offrande invalide. Vous devez sacrifier au moins 1 PV.")
+		fmt.Println(Red + "❌ Offrande invalide. L'autel exige un véritable sacrifice (au moins 1 PV)." + Reset)
 		return
 	}
 
-	// Vérifie si le sacrifice tue le personnage
 	if sacrifice >= joueur.PV {
 		joueur.PV = 0
-		fmt.Println("\nVous avez sacrifié toute votre force vitale... Zeus accepte votre âme. Game Over.")
+		fmt.Println(Bold + Red + "💀 Vous avez sacrifié toute votre force vitale... Zeus emporte votre âme. GAME OVER." + Reset)
 		return
 	}
 
-	// Application du sacrifice
 	joueur.PV -= sacrifice
 	obolesGagnees := sacrifice * 2
 	joueur.Argent += obolesGagnees
 
-	fmt.Printf("\nZeus accepte votre sang ! Vous sacrifiez %d PV et gagnez %d Oboles.\n", sacrifice, obolesGagnees)
-	fmt.Printf("PV restants : %d | Oboles : %d\n", joueur.PV, joueur.Argent)
+	fmt.Printf(Bold+Green+"⚡ Zeus accepte votre sang ! Vous sacrifiez "+Red+"%d PV"+Green+" et gagnez "+Yellow+"%d Oboles"+Green+".\n"+Reset, sacrifice, obolesGagnees)
+	fmt.Printf(Cyan+"❤️  PV restants : %d | 💰 Nouvel équilibre : %d Oboles\n"+Reset, joueur.PV, joueur.Argent)
 }

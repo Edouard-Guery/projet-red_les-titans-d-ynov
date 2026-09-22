@@ -93,5 +93,11 @@ func BoutiqueMarchand() []Equipement {
 			Description: "Augmente la défense globale.",
 			Prix:        50,
 		},
+		{
+			Nom:         "Augmentation de l'inventaire",
+			Source:      "shop",
+			Description: "Augmentation d’inventaire .",
+			Prix:        50,
+		},
 	}
 }
