@@ -119,6 +119,20 @@ func (p *Personnage) PotionDefensePlus() {
 	p.Defense += 10
 }
 
+func (p *Personnage) PotionEndurancePlus() {
+	p.Endurance += 25
+	if p.Endurance > p.EnduranceMax {
+		p.Endurance = p.EnduranceMax
+	}
+}
+
+func (p *Personnage) PotionEndurancePlusPlus() {
+	p.Endurance += 60
+	if p.Endurance > p.EnduranceMax {
+		p.Endurance = p.EnduranceMax
+	}
+}
+
 func (p *Personnage) PotionBaisseAttaque(m *Personnage) {
 	m.Attaque -= 10
 }

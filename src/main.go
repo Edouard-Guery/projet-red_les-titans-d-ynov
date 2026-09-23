@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/c-bata/go-prompt"
 )
 
 var Reset = "\033[0m"
@@ -31,6 +33,16 @@ func clearScreen() {
 	cmd.Run()
 }
 
+// Autocomplétion pour le choix de la classe
+func completerClasse(d prompt.Document) []prompt.Suggest {
+	return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "creature"}, {Text: "demi-dieu"}, {Text: "dieu"}}, d.GetWordBeforeCursor(), true)
+}
+
+// Autocomplétion pour le menu principal
+func completerMenu(d prompt.Document) []prompt.Suggest {
+	return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "start"}, {Text: "inv"}, {Text: "shop"}, {Text: "entrainement"}, {Text: "casino"}, {Text: "potions"}, {Text: "forge"}, {Text: "info"}, {Text: "autel"}, {Text: "quit"}, {Text: "clear"}}, d.GetWordBeforeCursor(), true)
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -50,16 +62,15 @@ func main() {
 		}
 	}
 
-	fmt.Print(Cyan + "⚔️  Entrez la classe de votre héros (creature / demi-dieu / dieu) : " + Reset)
-	if scanner.Scan() {
-		classeSaisie := strings.TrimSpace(strings.ToLower(scanner.Text()))
-		if classeSaisie != "" {
-			classeHero = classeSaisie
-		}
+	fmt.Println(Cyan + "⚔️  Entrez la classe de votre héros (creature / demi-dieu / dieu) : " + Reset)
+	classeSaisie := prompt.Input("👉 ", completerClasse)
+	if strings.TrimSpace(classeSaisie) != "" {
+		classeHero = strings.TrimSpace(strings.ToLower(classeSaisie))
 	}
 
 	hero := Person(nomHero, classeHero, scanner)
-	fmt.Printf("\n"+Green+"✨ Bienvenue, %s le %s ! Que votre quête commence."+Reset+"\n", hero.Nom, hero.Classe)
+	// go LancerServeurWeb(&hero) -- en attente, upgrade web
+	fmt.Printf("\n"+Green+"✨ Bienvenue %s, illustre %s ! Que votre quête commence."+Reset+"\n", hero.Nom, hero.Classe)
 
 	index := 0
 
@@ -69,15 +80,11 @@ func main() {
 		fmt.Println(White + " 🗡️  start      🎒 inv       🛒 shop      🎯 entrainement  🎲 casino" + Reset)
 		fmt.Println(White + " 🧪 potions    ⚒️  forge     ℹ️  info      🪙  autel         ❌ quit" + Reset)
 		fmt.Println(Blue + "-----------------------------------------------------------------------" + Reset)
-		fmt.Print(Cyan + "👉 " + Reset)
 
-		if !scanner.Scan() {
-			break
-		}
-
+		commandeSaisie := prompt.Input("👉 ", completerMenu)
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 
-		commande := strings.TrimSpace(strings.ToLower(scanner.Text()))
+		commande := strings.TrimSpace(strings.ToLower(commandeSaisie))
 
 		switch commande {
 		case "clear":
