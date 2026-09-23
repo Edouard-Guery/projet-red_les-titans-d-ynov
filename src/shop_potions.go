@@ -1,4 +1,3 @@
-// shop_potions.go
 package main
 
 import (
@@ -11,7 +10,7 @@ import (
 func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 	for {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
-		fmt.Println(Bold + Green + "              🍷 MAGASIN DE POTIONS DE DIONYSOS 🍷              " + Reset)
+		fmt.Println(Bold + Green + "                     🍷 MAGASIN DE POTIONS DE DIONYSOS 🍷                      " + Reset)
 		fmt.Println(Magenta + "============================================================" + Reset)
 		fmt.Printf(Cyan+"💰 Oboles : %d | 🎒 Inventaire : %d/%d\n"+Reset, p.Argent, p.nombreObjets(), p.CapaciteMax)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
@@ -26,7 +25,9 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 		fmt.Println(White + "  8. Potion baisse défense (-)   - " + Yellow + "40 Oboles" + Reset)
 		fmt.Println(White + "  9. Potion de poison (+)        - " + Yellow + "30 Oboles" + Reset)
 		fmt.Println(White + " 10. Potion de poison (++)       - " + Yellow + "60 Oboles" + Reset)
-		fmt.Println(Gray + " 11. Quitter la boutique" + Reset)
+		fmt.Println(White + " 11. Potion d'endurance (+)      - " + Yellow + "10 Oboles" + Reset)
+		fmt.Println(White + " 12. Potion d'endurance (++)     - " + Yellow + "30 Oboles" + Reset)
+		fmt.Println(Gray + " 13. Quitter la boutique" + Reset)
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
 		fmt.Print(Cyan + "👉 Ton verdict : " + Reset)
@@ -43,13 +44,13 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 			continue
 		}
 
-		if choix == 11 {
+		if choix == 13 {
 			fmt.Println(Gray + "👋 Vous quittez la boutique de Dionysos." + Reset)
 			break
 		}
 
-		nomPotion := ""
-		prix := 0
+		var nomPotion string
+		var prix int
 
 		switch choix {
 		case 1:
@@ -72,6 +73,10 @@ func (p *Personnage) ShopPotions(scanner *bufio.Scanner) {
 			nomPotion, prix = "Potion de poison (+)", 30
 		case 10:
 			nomPotion, prix = "Potion de poison (++)", 60
+		case 11:
+			nomPotion, prix = "Potion d'endurance (+)", 10
+		case 12:
+			nomPotion, prix = "Potion d'endurance (++)", 30
 		default:
 			fmt.Println(Red + "❌ Choix invalide." + Reset)
 			continue

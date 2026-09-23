@@ -77,11 +77,10 @@ func (c *Combat) LancerDéroulement() {
 		c.TourJoueur()
 
 		if c.Monstre.PV <= 0 {
-			// RÉCOMPENSE DYNAMIQUE : Basée sur les PV Max du monstre (ex: un monstre à 100 PV donne 10 à 20 oboles)
 			recompense := (c.Monstre.PVMax / 10) + rand.N(10)
-			if recompense < 5 {
-				recompense = 5
-			} // Minimum garanti
+			if recompense < 40 {
+				recompense = 40
+			}
 
 			c.Joueur.Argent += recompense
 
