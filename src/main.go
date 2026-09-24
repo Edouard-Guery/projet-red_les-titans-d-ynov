@@ -106,7 +106,7 @@ func main() {
 			}
 
 			monstre := ObtenirMonstre(index)
-			fmt.Printf("\n"+Bold+Red+"--- ⚔️ COMBAT %d/%d : %s apparaît ! ---"+Reset+"\n", index+1, len(ListeMonstres), monstre.Nom)
+			fmt.Printf("\n"+Bold+Red+"--- ⚔️ COMBAT %d/%d : Un %s apparaît ! ---"+Reset+"\n", index+1, len(ListeMonstres), monstre.Nom)
 
 			combat := NouveauCombatMonstre(&hero, &monstre)
 			combat.LancerDéroulement()
