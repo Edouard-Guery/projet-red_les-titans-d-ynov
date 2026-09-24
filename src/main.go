@@ -69,7 +69,6 @@ func main() {
 	}
 
 	hero := Person(nomHero, classeHero, scanner)
-	// go LancerServeurWeb(&hero) -- en attente, upgrade web
 	fmt.Printf("\n"+Green+"✨ Bienvenue %s, illustre %s ! Que votre quête commence."+Reset+"\n", hero.Nom, hero.Classe)
 
 	index := 0

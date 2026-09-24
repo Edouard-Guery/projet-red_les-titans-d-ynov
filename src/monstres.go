@@ -7,9 +7,9 @@ type Monstre struct {
 	Attaque       int
 	Defense       int
 	Drop          string
-	EstEmpoisonne bool      // Indique si le monstre subit le poison
-	DegatsPoison  int       // Dégâts infligés par tour de poison
-	Attaques      []attaque // Liste des attaques propres au monstre
+	EstEmpoisonne bool     
+	DegatsPoison  int       
+	Attaques      []attaque 
 }
 
 // ==========================================
