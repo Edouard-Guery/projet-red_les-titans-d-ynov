@@ -12,7 +12,7 @@ Un jeu de rôle (RPG) textuel en ligne de commande (CLI) se déroulant dans la m
 3. [Classes Jouables](#3-classes-jouables)
 4. [Prérequis et Installation](#4-prérequis-et-installation)
 5. [Guide des Commandes](#5-guide-des-commandes)
-6. [Architecture Technique](#6-architecture-technique)
+6. [Architecture Technique](#6-architecture-technique) 
 7. [Crédits et Remerciements](#7-crédits-et-remerciements)
 
 ---
