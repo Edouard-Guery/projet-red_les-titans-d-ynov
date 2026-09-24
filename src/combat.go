@@ -47,6 +47,8 @@ type Combat struct {
 	Monstre *Monstre
 
 	Tour int
+
+	Entrainement bool // true = combat d'entraînement, aucune récompense
 }
 
 func NouveauCombat(p *Personnage, m *Monstre) *Combat {
@@ -116,25 +118,23 @@ func (c *Combat) LancerDéroulement() {
 
 		c.TourJoueur()
 
-		if c.Monstre.PV <= 0 {
-
-			recompense := (c.Monstre.PVMax / 10) + rand.N(10)
-
-			if recompense < 40 {
-
-				recompense = 40
-
-			}
-
-			c.Joueur.Argent += recompense
-
+				if c.Monstre.PV <= 0 {
 			fmt.Println("\n" + Magenta + "============================================================" + Reset)
-
 			fmt.Printf(Bold+Green+"🏆 VICTOIRE ! %s a vaincu %s !\n"+Reset, c.Joueur.Nom, c.Monstre.Nom)
 
-			fmt.Printf(Yellow+"💰 Le butin s'élève à %d oboles !\n"+Reset, recompense)
+			if c.Entrainement {
+				fmt.Println(Gray + "🥊 Combat d'entraînement : aucune récompense n'est distribuée." + Reset)
+			} else {
+				recompense := (c.Monstre.PVMax / 10) + rand.N(10)
+				if recompense < 30 {
+					recompense = 30
+				}
 
-			fmt.Printf(Cyan+"💰 Oboles total : %d pièces.\n"+Reset, c.Joueur.Argent)
+				c.Joueur.Argent += recompense
+
+				fmt.Printf(Yellow+"💰 Le butin s'élève à %d oboles !\n"+Reset, recompense)
+				fmt.Printf(Cyan+"💰 Oboles total : %d pièces.\n"+Reset, c.Joueur.Argent)
+			}
 
 			fmt.Println(Magenta + "============================================================" + Reset)
 

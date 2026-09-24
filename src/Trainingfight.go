@@ -39,6 +39,7 @@ func trainingFight(joueur *Personnage, scanner *bufio.Scanner) {
 		monstreChoisi := ListeMonstres[choix-1]
 
 		combat := NouveauCombatMonstre(joueur, &monstreChoisi)
+		combat.Entrainement = true
 		combat.LancerDéroulement()
 
 		return
