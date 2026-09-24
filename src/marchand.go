@@ -87,7 +87,6 @@ func ChoisirItem(hero *Personnage, monstre *Personnage, scanner *bufio.Scanner) 
 		fmt.Printf(Green+"🛍️  Acheté : %s (-%d Oboles).\n"+Reset, itemChoisi.Nom, itemChoisi.Prix)
 	}
 
-	// Application des effets immédiats
 	switch nombre {
 	case 1:
 		hero.BouclierEclair()
