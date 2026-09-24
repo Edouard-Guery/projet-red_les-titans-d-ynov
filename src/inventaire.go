@@ -17,7 +17,7 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 		fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 
 		if len(p.Inventaire) == 0 {
-			fmt.Println(Gray + " Votre sac est vide." + Reset)
+			fmt.Println(Gray + " Votre inventaire est vide." + Reset)
 			fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 			return
 		}
