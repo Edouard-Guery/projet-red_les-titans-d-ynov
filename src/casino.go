@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	miseMaxCasino = 100 // Empêche de détruire l'économie du jeu d'un seul coup
+	miseMaxCasino = 100
 	miseMinCasino = 1
 )
 

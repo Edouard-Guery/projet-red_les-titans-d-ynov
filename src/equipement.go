@@ -2,10 +2,9 @@ package main
 
 import "fmt"
 
-// LISSAGE DES STATS D'ÉQUIPEMENT
 func (p *Personnage) EquiperCuirasseSauvage() {
 	p.Defense += 5
-	p.PVMax += 20 // Il vaut mieux augmenter les PV Max que juste soigner
+	p.PVMax += 20
 	p.PV += 20
 }
 
@@ -51,9 +50,6 @@ func (p *Personnage) EquiperArmureColosse() {
 
 func (p *Personnage) UtiliserEquipementForge(nom string) bool {
 	equipped := false
-
-	// Note: Idéalement, il faudrait vérifier ici si le joueur n'est pas DÉJÀ équipé
-	// d'une arme/armure pour éviter le cumul infini.
 
 	switch nom {
 	case "Cuirasse Sauvage":

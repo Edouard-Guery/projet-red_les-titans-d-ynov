@@ -48,7 +48,7 @@ func (p *Personnage) MenuInventaire(scanner *bufio.Scanner) {
 		choix := strings.TrimSpace(scanner.Text())
 
 		if choix == "0" {
-			fmt.Println(Gray + "🎒 Vous refermez votre sac." + Reset)
+			fmt.Println(Gray + "🎒 Vous refermez votre inventaire." + Reset)
 			return
 		}
 
