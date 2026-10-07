@@ -9,11 +9,11 @@ func (c *Combat) TourMonstre() {
 	fmt.Printf("\n"+Red+"👹 C'est au tour de %s !"+Reset+"\n", c.Monstre.Nom)
 
 	if len(c.Monstre.Attaques) == 0 {
-		fmt.Printf(Gray+"⚠️ %s n'a aucune attaque disponible.\n"+Reset, c.Monstre.Nom)
+		fmt.Printf(Gray+"⚠️ %s n'a aucune attaque disponible.\n"+Reset, c.Monstre.Nom)//on verifie que le monstre a bien des attaques
 		return
 	}
 
-	index := rand.N(len(c.Monstre.Attaques))
+	index := rand.N(len(c.Monstre.Attaques)) //tire un nombre au pif 
 	attaqueChoisie := c.Monstre.Attaques[index]
 
 	bonusAleatoire := 0
@@ -29,7 +29,7 @@ func (c *Combat) TourMonstre() {
 	} else if degatsBruts <= 0 {
 		degatsNets = 0
 	}
-	c.Joueur.PV -= degatsNets
+	c.Joueur.PV -= degatsNets //on retire les PV nets 
 	if c.Joueur.PV < 0 {
 		c.Joueur.PV = 0
 	}
@@ -44,7 +44,7 @@ func (c *Combat) TourMonstre() {
 
 	fmt.Printf(Red+"⚔️ Vous perdez %d PV.\n"+Reset, degatsNets)
 
-	if attaqueChoisie.regeneration > 0 {
+	if attaqueChoisie.regeneration > 0 { //fonction qui regen les monstres
 		c.Monstre.PV += attaqueChoisie.regeneration
 		if c.Monstre.PV > c.Monstre.PVMax {
 			c.Monstre.PV = c.Monstre.PVMax

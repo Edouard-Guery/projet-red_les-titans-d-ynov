@@ -1,6 +1,6 @@
 package main
 
-type Monstre struct {
+type Monstre struct { //strucure monstre
 	Nom           string
 	PV            int
 	PVMax         int
@@ -230,7 +230,7 @@ var ListeMonstres = []Monstre{
 	Athena, Poseidon, Hades, Zeus, Chronos,
 }
 
-func ObtenirMonstre(index int) Monstre {
+func ObtenirMonstre(index int) Monstre { //renvoie le monstre a la position index 
 	if index >= 0 && index < len(ListeMonstres) {
 		return ListeMonstres[index]
 	}

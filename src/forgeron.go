@@ -1,21 +1,21 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"sort"
-	"strconv"
-	"strings"
+	"bufio" //lire entrer utilisateur 
+	"fmt"//afficher du texte
+	"sort"//trier
+	"strconv"//convertir du text en nombre 
+	"strings"//manipuler du texte 
 )
 
-type Recette struct {
+type Recette struct {  //structure,une map d'ingrédients (nom de l'ingrédient → quantité requise)
 	Nom         string
 	Tier        string
 	Ingredients map[string]int
 	Cout        int
 }
 
-func recettesForgeron() []Recette {
+func recettesForgeron() []Recette { //Renvoie un tableau ([]Recette)
 	return []Recette{
 		// T1
 		{
@@ -82,7 +82,8 @@ func recettesForgeron() []Recette {
 	}
 }
 
-func (p *Personnage) nombreObjets() int {
+func (p *Personnage) nombreObjets() int { //Additionne toutes les quantités de la map Inventaire 
+	                                     // pour connaître le nombre total d'objets possédés
 	total := 0
 	for _, quantite := range p.Inventaire {
 		total += quantite
@@ -91,7 +92,7 @@ func (p *Personnage) nombreObjets() int {
 }
 
 func (p *Personnage) peutForger(recette Recette) error {
-	if p.Argent < recette.Cout {
+	if p.Argent < recette.Cout { //verifie l'argent 
 		return fmt.Errorf(
 			Red+"❌ Héphaïstos secoue la tête : il demande %d Oboles, tu n'en as que %d."+Reset,
 			recette.Cout,
@@ -143,26 +144,26 @@ func (p *Personnage) forger(recette Recette) error {
 	}
 
 	for ingredient, quantite := range recette.Ingredients {
-		p.Inventaire[ingredient] -= quantite
+		p.Inventaire[ingredient] -= quantite //retire chaque ingrédient de l'inventaire 
 		if p.Inventaire[ingredient] <= 0 {
-			delete(p.Inventaire, ingredient)
+			delete(p.Inventaire, ingredient) // et le supprime complètement de la map avec delete
 		}
 	}
 
 	p.Argent -= recette.Cout
-	p.Inventaire[recette.Nom]++
+	p.Inventaire[recette.Nom]++ //ajoute l'objet fabriqué a l'inventaire
 
 	return nil
 }
 
-func texteIngredients(ingredients map[string]int) string {
+func texteIngredients(ingredients map[string]int) string { //transform la map d'ingredients en  texte lisible 
 	noms := make([]string, 0, len(ingredients))
 
 	for nom := range ingredients {
 		noms = append(noms, nom)
 	}
 
-	sort.Strings(noms)
+	sort.Strings(noms) //tirer les noms par ordre alphabétique 
 
 	resultat := []string{}
 	for _, nom := range noms {
@@ -172,7 +173,7 @@ func texteIngredients(ingredients map[string]int) string {
 	return strings.Join(resultat, " + ")
 }
 
-func afficherInventaire(p *Personnage) {
+func afficherInventaire(p *Personnage) { // affiche l'inventaire 
 	fmt.Println("\n" + Magenta + "============================================================" + Reset)
 	fmt.Println(Bold + Yellow + "                       🎒 VOTRE INVENTAIRE                       " + Reset)
 	fmt.Println(Magenta + "============================================================" + Reset)
@@ -196,7 +197,7 @@ func afficherInventaire(p *Personnage) {
 	fmt.Println(Blue + "------------------------------------------------------------" + Reset)
 }
 
-func afficherRecettesTier(recettes []Recette, tier string) {
+func afficherRecettesTier(recettes []Recette, tier string) { //affiche les recttes 
 	fmt.Printf("\n"+Bold+Yellow+"--- ⚜️  %s ⚜️  ---"+Reset+"\n", tier)
 
 	for index, recette := range recettes {
@@ -212,7 +213,7 @@ func afficherRecettesTier(recettes []Recette, tier string) {
 	}
 }
 
-func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
+func menuForgeron(p *Personnage, scanner *bufio.Scanner) {//affiche menu principal, boucle infini
 	for {
 		fmt.Println("\n" + Magenta + "============================================================" + Reset)
 		fmt.Println(Bold + Red + "               🔥 LE VESTIBULE DE LA FORGE 🔥               " + Reset)
@@ -233,7 +234,7 @@ func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
 
 		switch strings.TrimSpace(scanner.Text()) {
 		case "1":
-			sousMenuHephaistos(p, scanner)
+			sousMenuHephaistos(p, scanner)  
 		case "2":
 			afficherInventaire(p)
 			fmt.Print(Gray + "Prends le temps d'inspecter tes trouvailles... [Entrée]" + Reset)
@@ -247,7 +248,7 @@ func menuForgeron(p *Personnage, scanner *bufio.Scanner) {
 	}
 }
 
-func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) {
+func sousMenuHephaistos(p *Personnage, scanner *bufio.Scanner) { //sous menu de fabrication
 	recettes := recettesForgeron()
 
 	for {
